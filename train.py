@@ -90,7 +90,9 @@ x_text, y = data_helpers.load_positive_negative_data_files(FLAGS)
 # Get embedding vector
 sentences, max_document_length = data_helpers.padding_sentences(x_text, '<PADDING>')
 if not os.path.exists(_w2v_path):
-    np.array(word2vec_helpers.embedding_sentences(sentences, embedding_size = FLAGS.embedding_dim, file_to_save = _w2v_path))
+    _, w2vModel = word2vec_helpers.embedding_sentences(sentences, embedding_size = FLAGS.embedding_dim, file_to_save = _w2v_path)
+else:
+    _, w2vModel = word2vec_helpers.embedding_sentences(sentences, embedding_size = FLAGS.embedding_dim, file_to_load = _w2v_path)
 
 x = np.array(sentences)
 print("x.shape = {}".format(x.shape))
@@ -214,7 +216,9 @@ with tf.Graph().as_default():
         # Training loop. For each batch...
         for batch in batches:
             x_batch, y_batch = zip(*batch)
-            x_batch = np.array(word2vec_helpers.embedding_sentences(x_batch, embedding_size = FLAGS.embedding_dim, file_to_load = _w2v_path))
+            x_batch_embedding, _ = word2vec_helpers.embedding_sentences(x_batch, embedding_size = FLAGS.embedding_dim,
+                                                                        file_to_load = _w2v_path, model=w2vModel)
+            x_batch = np.array(x_batch_embedding)
             train_step(x_batch, y_batch)
             current_step = tf.train.global_step(sess, global_step)
             if current_step % FLAGS.evaluate_every == 0:

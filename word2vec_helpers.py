@@ -19,15 +19,18 @@ def output_vocab(vocab):
     for k, v in vocab.items():
         print(k)
 
-def embedding_sentences(sentences, embedding_size = 128, window = 5, min_count = 5, file_to_load = None, file_to_save = None):
+def embedding_sentences(sentences, embedding_size = 128, window = 5, min_count = 5, file_to_load = None, file_to_save = None, model = None):
     all_vectors = []
-    if file_to_load is not None:
-        w2vModel = Word2Vec.load(file_to_load)
+    if model is not None:
+        w2vModel = model
     else:
-        w2vModel = Word2Vec(sentences, size = embedding_size, window = window, min_count = min_count, workers = multiprocessing.cpu_count())
-        if file_to_save is not None:
-            w2vModel.save(file_to_save)
-        return all_vectors
+        if file_to_load is not None:
+            w2vModel = Word2Vec.load(file_to_load)
+        else:
+            w2vModel = Word2Vec(sentences, size = embedding_size, window = window, min_count = min_count, workers = multiprocessing.cpu_count())
+            if file_to_save is not None:
+                w2vModel.save(file_to_save)
+            return all_vectors, w2vModel
 
     embeddingDim = w2vModel.vector_size
     embeddingUnknown = [0 for i in range(embeddingDim)]
@@ -39,7 +42,7 @@ def embedding_sentences(sentences, embedding_size = 128, window = 5, min_count =
             else:
                 this_vector.append(embeddingUnknown)
         all_vectors.append(this_vector)
-    return all_vectors
+    return all_vectors, w2vModel
 
 
 def generate_word2vec_files(input_file, output_model_file, output_vector_file, size = 128, window = 5, min_count = 5):
