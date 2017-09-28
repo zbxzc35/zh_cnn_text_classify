@@ -222,6 +222,9 @@ with tf.Graph().as_default():
             train_step(x_batch, y_batch)
             current_step = tf.train.global_step(sess, global_step)
             if current_step % FLAGS.evaluate_every == 0:
+                x_batch_embedding, _ = word2vec_helpers.embedding_sentences(x_dev, embedding_size=FLAGS.embedding_dim,
+                                                                            file_to_load=_w2v_path, model=w2vModel)
+                x_dev = np.array(x_batch_embedding)
                 print("\nEvaluation:")
                 dev_step(x_dev, y_dev, writer=dev_summary_writer)
                 print("")
