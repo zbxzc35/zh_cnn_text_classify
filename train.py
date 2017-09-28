@@ -61,6 +61,7 @@ tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device 
 tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
 
 # Parse parameters from commands
+
 FLAGS = tf.flags.FLAGS
 FLAGS._parse_flags()
 print("\nParameters:")
@@ -73,6 +74,7 @@ print("")
 
 timestamp = str(int(time.time()))
 out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", timestamp))
+_w2v_path = os.path.join(out_dir, 'trained_word2vec.model')
 print("Writing to {}\n".format(out_dir))
 if not os.path.exists(out_dir):
     os.makedirs(out_dir)
@@ -86,7 +88,10 @@ x_text, y = data_helpers.load_positive_negative_data_files(FLAGS)
 
 # Get embedding vector
 sentences, max_document_length = data_helpers.padding_sentences(x_text, '<PADDING>')
-x = np.array(word2vec_helpers.embedding_sentences(sentences, embedding_size = FLAGS.embedding_dim, file_to_save = os.path.join(out_dir, 'trained_word2vec.model')))
+if not os.path.exists(_w2v_path):
+    x = np.array(word2vec_helpers.embedding_sentences(sentences, embedding_size = FLAGS.embedding_dim, file_to_load = _w2v_path))
+else:
+    x = np.array(word2vec_helpers.embedding_sentences(sentences, embedding_size = FLAGS.embedding_dim, file_to_save = _w2v_path))
 print("x.shape = {}".format(x.shape))
 print("y.shape = {}".format(y.shape))
 

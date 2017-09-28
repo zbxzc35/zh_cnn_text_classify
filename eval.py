@@ -14,7 +14,7 @@ import csv
 # ==================================================
 
 # Data Parameters
-tf.flags.DEFINE_string("input_text_file", "./data/spam_100.utf8", "Test text data source to evaluate.")
+tf.flags.DEFINE_string("input_text_file", "", "Test text data source to evaluate.")
 tf.flags.DEFINE_string("input_label_file", "", "Label file for test text data source.")
 
 # Eval Parameters
