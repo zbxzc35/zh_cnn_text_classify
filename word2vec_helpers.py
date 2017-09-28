@@ -19,7 +19,7 @@ def output_vocab(vocab):
     for k, v in vocab.items():
         print(k)
 
-def embedding_sentences(sentences, embedding_size = 128, window = 5, min_count = 5, file_to_load = None, file_to_save = None, model = None):
+def embedding_sentences(sentences = None, embedding_size = 128, window = 5, min_count = 5, file_to_load = None, file_to_save = None, model = None):
     all_vectors = []
     if model is not None:
         w2vModel = model
@@ -31,17 +31,17 @@ def embedding_sentences(sentences, embedding_size = 128, window = 5, min_count =
             if file_to_save is not None:
                 w2vModel.save(file_to_save)
             return all_vectors, w2vModel
-
-    embeddingDim = w2vModel.vector_size
-    embeddingUnknown = [0 for i in range(embeddingDim)]
-    for sentence in sentences:
-        this_vector = []
-        for word in sentence:
-            if word in w2vModel.wv.vocab:
-                this_vector.append(w2vModel[word])
-            else:
-                this_vector.append(embeddingUnknown)
-        all_vectors.append(this_vector)
+    if sentences is not None:
+        embeddingDim = w2vModel.vector_size
+        embeddingUnknown = [0 for i in range(embeddingDim)]
+        for sentence in sentences:
+            this_vector = []
+            for word in sentence:
+                if word in w2vModel.wv.vocab:
+                    this_vector.append(w2vModel[word])
+                else:
+                    this_vector.append(embeddingUnknown)
+            all_vectors.append(this_vector)
     return all_vectors, w2vModel
 
 
@@ -73,5 +73,5 @@ def run_main():
     generate_word2vec_files(input_file, output_model_file, output_vector_file) 
 
 def test():
-    vectors = embedding_sentences([['first', 'sentence'], ['second', 'sentence']], embedding_size = 4, min_count = 1)
+    vectors = embedding_sentences(sentences = [['first', 'sentence'], ['second', 'sentence']], embedding_size = 4, min_count = 1)
     print(vectors)

@@ -69,7 +69,7 @@ else:
 
 # Get Embedding vector x_test
 sentences, max_document_length = data_helpers.padding_sentences(x_raw, '<PADDING>', padding_sentence_length = max_document_length)
-x_test = np.array(word2vec_helpers.embedding_sentences(sentences, file_to_load = trained_word2vec_model_file))
+x_test = np.array(word2vec_helpers.embedding_sentences(sentences = sentences, file_to_load = trained_word2vec_model_file))
 print("x_test.shape = {}".format(x_test.shape))
 
 
