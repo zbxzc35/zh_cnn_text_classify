@@ -37,8 +37,10 @@ tf.flags.DEFINE_string("Survey_Questions_file", "./data/Survey Questions.utf8", 
 tf.flags.DEFINE_string("Volunteering_Activity_file", "./data/Volunteering Activity.utf8", "Data source for the Volunteering Activity data.")
 tf.flags.DEFINE_string("Website_Issues_file", "./data/Website Issues.utf8", "Data source for the Website Issues data.")
 
-tf.flags.DEFINE_string("General_Mentioned_file", "./data/General Mentioned.utf8", "Data source for the Website Issues data.")
-tf.flags.DEFINE_string("Stocks_Earnings_file", "./data/Stocks&Earnings.utf8", "Data source for the Website Issues data.")
+tf.flags.DEFINE_string("General_Mentioned_file", "./data/General Mentioned.utf8", "Data source for the General Mentioned data.")
+tf.flags.DEFINE_string("Stocks_Earnings_file", "./data/Stocks&Earnings.utf8", "Data source for the Stocks&Earnings data.")
+
+tf.flags.DEFINE_string("Products_file", "./data/Products.utf8", "Data source for the  Products data.")
 
 tf.flags.DEFINE_integer("num_labels", 21, "Number of labels for data. (default: 2)")
 
