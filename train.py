@@ -40,7 +40,7 @@ tf.flags.DEFINE_string("Website_Issues_file", "./data/Website Issues.utf8", "Dat
 tf.flags.DEFINE_string("General_Mentioned_file", "./data/General Mentioned.utf8", "Data source for the Website Issues data.")
 tf.flags.DEFINE_string("Stocks_Earnings_file", "./data/Stocks&Earnings.utf8", "Data source for the Website Issues data.")
 
-tf.flags.DEFINE_integer("num_labels", 19, "Number of labels for data. (default: 2)")
+tf.flags.DEFINE_integer("num_labels", 21, "Number of labels for data. (default: 2)")
 
 # Model hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 128, "Dimensionality of character embedding (default: 128)")

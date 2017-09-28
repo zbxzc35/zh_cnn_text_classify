@@ -40,40 +40,46 @@ def load_positive_negative_data_files(FLAGS):
     Volunteering_Activity_examples = read_and_clean_zh_file(FLAGS.Volunteering_Activity_file)
     Website_Issues_examples        = read_and_clean_zh_file(FLAGS.Website_Issues_file)
 
+    General_Mentioned_examples     = read_and_clean_zh_file(FLAGS.General_Mentioned_file)
+    Stocks_Earnings_examples       = read_and_clean_zh_file(FLAGS.Stocks_Earnings_file)
+
     # Combine data
     x_test = Ads_Marketing_examples + Agent_Issues_examples + Charity_Events_examples + \
              Contact_Information_examples + Corporate_Brands_examples + Corporate_News_examples + \
              Customer_Service_examples + Employment_examples + Fund_examples + Health_Information_examples + \
              Irrelevant_Ads_examples + Life_Comprehend_examples + Products_examples + Products_Service_examples + \
              Recruitment_examples + Sponsored_Events_examples + Survey_Questions_examples + \
-             Volunteering_Activity_examples + Website_Issues_examples
+             Volunteering_Activity_examples + Website_Issues_examples + General_Mentioned_examples + Stocks_Earnings_examples
     # Generate labels
-    Ads_Marketing_labels         = [[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Ads_Marketing_examples]
-    Agent_Issues_labels          = [[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Agent_Issues_examples]
-    Charity_Events_labels        = [[0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Charity_Events_examples]
-    Contact_Information_labels   = [[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Contact_Information_examples]
-    Corporate_Brand_labels       = [[0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Corporate_Brands_examples]
-    Corporate_News_labels        = [[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Corporate_News_examples]
-    Customer_Service_labels      = [[0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Customer_Service_examples]
-    Employment_labels            = [[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Employment_examples]
-    Fund_labels                  = [[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Fund_examples]
-    Health_Information_labels    = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Health_Information_examples]
-    Irrelevant_Ads_labels        = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Irrelevant_Ads_examples]
-    Life_Comprehend_labels       = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0] for _ in Life_Comprehend_examples]
-    Products_labels              = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0] for _ in Products_examples]
-    Products_Service_labels      = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0] for _ in Products_Service_examples]
-    Recruitment_labels           = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0] for _ in Recruitment_examples]
-    Sponsored_Events_labels      = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0] for _ in Sponsored_Events_examples]
-    Survey_Questions_labels      = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0] for _ in Survey_Questions_examples]
-    Volunteering_Activity_labels = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0] for _ in Volunteering_Activity_examples]
-    Website_Issues_labels        = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] for _ in Website_Issues_examples]
+    Ads_Marketing_labels         = [[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Ads_Marketing_examples]
+    Agent_Issues_labels          = [[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Agent_Issues_examples]
+    Charity_Events_labels        = [[0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Charity_Events_examples]
+    Contact_Information_labels   = [[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Contact_Information_examples]
+    Corporate_Brand_labels       = [[0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Corporate_Brands_examples]
+    Corporate_News_labels        = [[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Corporate_News_examples]
+    Customer_Service_labels      = [[0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Customer_Service_examples]
+    Employment_labels            = [[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Employment_examples]
+    Fund_labels                  = [[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Fund_examples]
+    Health_Information_labels    = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Health_Information_examples]
+    Irrelevant_Ads_labels        = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Irrelevant_Ads_examples]
+    Life_Comprehend_labels       = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Life_Comprehend_examples]
+    Products_labels              = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Products_examples]
+    Products_Service_labels      = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0] for _ in Products_Service_examples]
+    Recruitment_labels           = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0] for _ in Recruitment_examples]
+    Sponsored_Events_labels      = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0] for _ in Sponsored_Events_examples]
+    Survey_Questions_labels      = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0] for _ in Survey_Questions_examples]
+    Volunteering_Activity_labels = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0] for _ in Volunteering_Activity_examples]
+    Website_Issues_labels        = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0] for _ in Website_Issues_examples]
+    General_Mentioned_labels     = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0] for _ in General_Mentioned_examples]
+    Stocks_Earnings_labels       = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] for _ in Stocks_Earnings_examples]
+
 
     y = np.concatenate([Ads_Marketing_labels, Agent_Issues_labels, Charity_Events_labels,
                         Contact_Information_labels, Corporate_Brand_labels, Corporate_News_labels,
                         Customer_Service_labels, Employment_labels, Fund_labels, Health_Information_labels,
                         Irrelevant_Ads_labels, Life_Comprehend_labels, Products_labels, Products_Service_labels,
                         Recruitment_labels, Sponsored_Events_labels, Survey_Questions_labels,
-                        Volunteering_Activity_labels, Website_Issues_labels], 0)
+                        Volunteering_Activity_labels, Website_Issues_labels, General_Mentioned_labels, Stocks_Earnings_labels], 0)
     return [x_test, y]
 
 def padding_sentences(input_sentences, padding_token, padding_sentence_length = None):
