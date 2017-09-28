@@ -222,7 +222,11 @@ with tf.Graph().as_default():
             train_step(x_batch, y_batch)
             current_step = tf.train.global_step(sess, global_step)
             if current_step % FLAGS.evaluate_every == 0:
-                x_batch_embedding, _ = word2vec_helpers.embedding_sentences(x_dev, embedding_size=FLAGS.embedding_dim,
+                shuffle_indices = np.random.permutation(np.arange(len(x_dev)))[:FLAGS.batch_size]
+                x_dev_shuffled = x[shuffle_indices]
+                y_dev_shuffled = y[shuffle_indices]
+
+                x_batch_embedding, _ = word2vec_helpers.embedding_sentences(x_dev_shuffled, embedding_size=FLAGS.embedding_dim,
                                                                             file_to_load=_w2v_path, model=w2vModel)
                 x_dev = np.array(x_batch_embedding)
                 print("\nEvaluation:")
