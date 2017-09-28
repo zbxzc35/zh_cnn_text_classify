@@ -1,8 +1,8 @@
 # 基于cnn的中文文本分类算法
 
 ## 简介
-参考[IMPLEMENTING A CNN FOR TEXT CLASSIFICATION IN TENSORFLOW](http://www.wildml.com/2015/12/implementing-a-cnn-for-text-classification-in-tensorflow/)实现的一个简单的卷积神经网络，用于中文文本分类任务（此项目使用的数据集是中文垃圾邮件识别任务的数据集），数据集下载地址：[百度网盘](https://pan.baidu.com/s/1i4HaYTB)
-
+参考[IMPLEMENTING A CNN FOR TEXT CLASSIFICATION IN TENSORFLOW](http://www.wildml.com/2015/12/implementing-a-cnn-for-text-classification-in-tensorflow/)实现的一个简单的卷积神经网络，用于中文文本分类任务
+The original repository is [here](https://github.com/clayandgithub/zh_cnn_text_classify), where there are also a bunch of raw data files necessary to train the model. The raw data files were downloaded from the Internet, mostly from similar open source projects.
 ## 区别
 原博客实现的cnn用于英文文本分类，没有使用word2vec来获取单词的向量表达，而是在网络中添加了embedding层来来获取向量。<br/>
 而此项目则是利用word2vec先获取中文测试数据集中各个<strong>字</strong>的向量表达，再输入卷积网络进行分类。
@@ -31,4 +31,4 @@ gensim 1.0.1
 Ubuntu16.04 64bit  
 
 ### 说明
-若按照以上步骤无法正常运行程序，请在Issues或在[博客](http://blog.csdn.net/clayanddev/article/details/70738475)中提问，我会尽快回复。
+若按照以上步骤无法正常运行程序，请在Issues或在原作者[博客](http://blog.csdn.net/clayanddev/article/details/70738475)中提问，我会尽快回复。
