@@ -43,7 +43,6 @@ def load_positive_negative_data_files(FLAGS):
     General_Mentioned_examples     = read_and_clean_zh_file(FLAGS.General_Mentioned_file)
     Stocks_Earnings_examples       = read_and_clean_zh_file(FLAGS.Stocks_Earnings_file)
 
-    Products_examples = read_and_clean_zh_file(FLAGS.Products_file)
 
     # Combine data
     x_test = Ads_Marketing_examples + Agent_Issues_examples + Charity_Events_examples + \

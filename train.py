@@ -40,7 +40,6 @@ tf.flags.DEFINE_string("Website_Issues_file", "./data/Website Issues.utf8", "Dat
 tf.flags.DEFINE_string("General_Mentioned_file", "./data/General Mentioned.utf8", "Data source for the General Mentioned data.")
 tf.flags.DEFINE_string("Stocks_Earnings_file", "./data/Stocks&Earnings.utf8", "Data source for the Stocks&Earnings data.")
 
-tf.flags.DEFINE_string("Products_file", "./data/Products.utf8", "Data source for the  Products data.")
 
 tf.flags.DEFINE_integer("num_labels", 21, "Number of labels for data. (default: 2)")
 
@@ -76,7 +75,7 @@ print("")
 
 timestamp = str(int(time.time()))
 out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", timestamp))
-_w2v_path = os.path.join(out_dir, 'trained_word2vec.model')
+_w2v_path = os.path.join(os.path.curdir, "runs", 'trained_word2vec.model')
 print("Writing to {}\n".format(out_dir))
 if not os.path.exists(out_dir):
     os.makedirs(out_dir)
@@ -91,9 +90,9 @@ x_text, y = data_helpers.load_positive_negative_data_files(FLAGS)
 # Get embedding vector
 sentences, max_document_length = data_helpers.padding_sentences(x_text, '<PADDING>')
 if not os.path.exists(_w2v_path):
-    x = np.array(word2vec_helpers.embedding_sentences(sentences, embedding_size = FLAGS.embedding_dim, file_to_load = _w2v_path))
-else:
-    x = np.array(word2vec_helpers.embedding_sentences(sentences, embedding_size = FLAGS.embedding_dim, file_to_save = _w2v_path))
+    np.array(word2vec_helpers.embedding_sentences(sentences, embedding_size = FLAGS.embedding_dim, file_to_save = _w2v_path))
+
+x = np.array(sentences)
 print("x.shape = {}".format(x.shape))
 print("y.shape = {}".format(y.shape))
 
@@ -215,6 +214,7 @@ with tf.Graph().as_default():
         # Training loop. For each batch...
         for batch in batches:
             x_batch, y_batch = zip(*batch)
+            x_batch = np.array(word2vec_helpers.embedding_sentences(x_batch, embedding_size = FLAGS.embedding_dim, file_to_load = _w2v_path))
             train_step(x_batch, y_batch)
             current_step = tf.train.global_step(sess, global_step)
             if current_step % FLAGS.evaluate_every == 0:

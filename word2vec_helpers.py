@@ -20,13 +20,15 @@ def output_vocab(vocab):
         print(k)
 
 def embedding_sentences(sentences, embedding_size = 128, window = 5, min_count = 5, file_to_load = None, file_to_save = None):
+    all_vectors = []
     if file_to_load is not None:
         w2vModel = Word2Vec.load(file_to_load)
     else:
         w2vModel = Word2Vec(sentences, size = embedding_size, window = window, min_count = min_count, workers = multiprocessing.cpu_count())
         if file_to_save is not None:
             w2vModel.save(file_to_save)
-    all_vectors = []
+        return all_vectors
+
     embeddingDim = w2vModel.vector_size
     embeddingUnknown = [0 for i in range(embeddingDim)]
     for sentence in sentences:
