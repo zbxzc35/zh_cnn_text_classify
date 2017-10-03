@@ -73,7 +73,7 @@ print("")
 # Prepare output directory for models and summaries
 # =======================================================
 
-timestamp = str(int(time.time()))
+timestamp = datetime.datetime.now().isoformat()
 out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", timestamp))
 _w2v_path = os.path.join(os.path.curdir, "runs", 'trained_word2vec.model')
 print("Writing to {}\n".format(out_dir))
