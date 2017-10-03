@@ -8,6 +8,8 @@ import os
 import word2vec_helpers
 import time
 import pickle
+from os import listdir
+from os.path import isfile, join
 
 def load_data_and_labels(input_text_file, input_label_file, num_labels):
     x_text = read_and_clean_zh_file(input_text_file)
@@ -20,68 +22,60 @@ def load_positive_negative_data_files(FLAGS):
     Returns split sentences and labels.
     """
     # Load data from files
-    Ads_Marketing_examples         = read_and_clean_zh_file(FLAGS.Ads_Marketing_file)
-    Agent_Issues_examples          = read_and_clean_zh_file(FLAGS.Agent_Issues_file)
-    Charity_Events_examples        = read_and_clean_zh_file(FLAGS.Charity_Events_file)
-    Contact_Information_examples   = read_and_clean_zh_file(FLAGS.Contact_Information_file)
-    Corporate_Brands_examples      = read_and_clean_zh_file(FLAGS.Corporate_Brands_file)
-    Corporate_News_examples        = read_and_clean_zh_file(FLAGS.Corporate_News_file)
-    Customer_Service_examples      = read_and_clean_zh_file(FLAGS.Customer_Service_file)
-    Employment_examples            = read_and_clean_zh_file(FLAGS.Employment_file)
-    Fund_examples                  = read_and_clean_zh_file(FLAGS.Fund_file)
-    Health_Information_examples    = read_and_clean_zh_file(FLAGS.Health_Information_file)
-    Irrelevant_Ads_examples        = read_and_clean_zh_file(FLAGS.Irrelevant_Ads_file)
-    Life_Comprehend_examples       = read_and_clean_zh_file(FLAGS.Life_Comprehend_file)
-    Products_examples              = read_and_clean_zh_file(FLAGS.Products_file)
-    Products_Service_examples      = read_and_clean_zh_file(FLAGS.Products_Service_file)
-    Recruitment_examples           = read_and_clean_zh_file(FLAGS.Recruitment_file)
-    Sponsored_Events_examples      = read_and_clean_zh_file(FLAGS.Sponsored_Events_file)
-    Survey_Questions_examples      = read_and_clean_zh_file(FLAGS.Survey_Questions_file)
-    Volunteering_Activity_examples = read_and_clean_zh_file(FLAGS.Volunteering_Activity_file)
-    Website_Issues_examples        = read_and_clean_zh_file(FLAGS.Website_Issues_file)
-
-    General_Mentioned_examples     = read_and_clean_zh_file(FLAGS.General_Mentioned_file)
-    Stocks_Earnings_examples       = read_and_clean_zh_file(FLAGS.Stocks_Earnings_file)
-
+    # Ads_Marketing_examples         = read_and_clean_zh_file(FLAGS.Ads_Marketing_file)
+    # Agent_Issues_examples          = read_and_clean_zh_file(FLAGS.Agent_Issues_file)
+    # Charity_Events_examples        = read_and_clean_zh_file(FLAGS.Charity_Events_file)
+    # Contact_Information_examples   = read_and_clean_zh_file(FLAGS.Contact_Information_file)
+    # Corporate_Brands_examples      = read_and_clean_zh_file(FLAGS.Corporate_Brands_file)
+    # Corporate_News_examples        = read_and_clean_zh_file(FLAGS.Corporate_News_file)
+    # Customer_Service_examples      = read_and_clean_zh_file(FLAGS.Customer_Service_file)
+    # Employment_examples            = read_and_clean_zh_file(FLAGS.Employment_file)
+    # Fund_examples                  = read_and_clean_zh_file(FLAGS.Fund_file)
+    # Health_Information_examples    = read_and_clean_zh_file(FLAGS.Health_Information_file)
+    # Irrelevant_Ads_examples        = read_and_clean_zh_file(FLAGS.Irrelevant_Ads_file)
+    # Life_Comprehend_examples       = read_and_clean_zh_file(FLAGS.Life_Comprehend_file)
+    # Products_examples              = read_and_clean_zh_file(FLAGS.Products_file)
+    # Products_Service_examples      = read_and_clean_zh_file(FLAGS.Products_Service_file)
+    # Recruitment_examples           = read_and_clean_zh_file(FLAGS.Recruitment_file)
+    # Sponsored_Events_examples      = read_and_clean_zh_file(FLAGS.Sponsored_Events_file)
+    # Survey_Questions_examples      = read_and_clean_zh_file(FLAGS.Survey_Questions_file)
+    # Volunteering_Activity_examples = read_and_clean_zh_file(FLAGS.Volunteering_Activity_file)
+    # Website_Issues_examples        = read_and_clean_zh_file(FLAGS.Website_Issues_file)
+    #
+    # General_Mentioned_examples     = read_and_clean_zh_file(FLAGS.General_Mentioned_file)
+    # Stocks_Earnings_examples       = read_and_clean_zh_file(FLAGS.Stocks_Earnings_file)
+    mypath = FLAGS.data_dir
+    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+    FLAGS.num_labels = len(onlyfiles)
 
     # Combine data
-    x_test = Ads_Marketing_examples + Agent_Issues_examples + Charity_Events_examples + \
-             Contact_Information_examples + Corporate_Brands_examples + Corporate_News_examples + \
-             Customer_Service_examples + Employment_examples + Fund_examples + Health_Information_examples + \
-             Irrelevant_Ads_examples + Life_Comprehend_examples + Products_examples + Products_Service_examples + \
-             Recruitment_examples + Sponsored_Events_examples + Survey_Questions_examples + \
-             Volunteering_Activity_examples + Website_Issues_examples + General_Mentioned_examples + Stocks_Earnings_examples
+    examples = []
+    for i in range(len(onlyfiles)):
+        examples.append(read_and_clean_zh_file(mypath + onlyfiles[i]))
+        if i == 0:
+            x_text = examples[i][:]
+        else:
+            x_text += examples[i][:]
+
+
+
+
     # Generate labels
-    Ads_Marketing_labels         = [[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Ads_Marketing_examples]
-    Agent_Issues_labels          = [[0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Agent_Issues_examples]
-    Charity_Events_labels        = [[0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Charity_Events_examples]
-    Contact_Information_labels   = [[0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Contact_Information_examples]
-    Corporate_Brand_labels       = [[0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Corporate_Brands_examples]
-    Corporate_News_labels        = [[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Corporate_News_examples]
-    Customer_Service_labels      = [[0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Customer_Service_examples]
-    Employment_labels            = [[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Employment_examples]
-    Fund_labels                  = [[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Fund_examples]
-    Health_Information_labels    = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Health_Information_examples]
-    Irrelevant_Ads_labels        = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Irrelevant_Ads_examples]
-    Life_Comprehend_labels       = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Life_Comprehend_examples]
-    Products_labels              = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0] for _ in Products_examples]
-    Products_Service_labels      = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0] for _ in Products_Service_examples]
-    Recruitment_labels           = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0] for _ in Recruitment_examples]
-    Sponsored_Events_labels      = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0] for _ in Sponsored_Events_examples]
-    Survey_Questions_labels      = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0] for _ in Survey_Questions_examples]
-    Volunteering_Activity_labels = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0] for _ in Volunteering_Activity_examples]
-    Website_Issues_labels        = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0] for _ in Website_Issues_examples]
-    General_Mentioned_labels     = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0] for _ in General_Mentioned_examples]
-    Stocks_Earnings_labels       = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] for _ in Stocks_Earnings_examples]
+    I = np.eye(len(onlyfiles), dtype=int)
+    for i in range(len(onlyfiles)):
+        if i == 0:
+            y = [I[i] for _ in examples[i]]
+        else:
+            y += [I[i] for _ in examples[i]]
 
 
-    y = np.concatenate([Ads_Marketing_labels, Agent_Issues_labels, Charity_Events_labels,
-                        Contact_Information_labels, Corporate_Brand_labels, Corporate_News_labels,
-                        Customer_Service_labels, Employment_labels, Fund_labels, Health_Information_labels,
-                        Irrelevant_Ads_labels, Life_Comprehend_labels, Products_labels, Products_Service_labels,
-                        Recruitment_labels, Sponsored_Events_labels, Survey_Questions_labels,
-                        Volunteering_Activity_labels, Website_Issues_labels, General_Mentioned_labels, Stocks_Earnings_labels], 0)
-    return [x_test, y]
+    # y = np.concatenate([Ads_Marketing_labels, Agent_Issues_labels, Charity_Events_labels,
+    #                     Contact_Information_labels, Corporate_Brand_labels, Corporate_News_labels,
+    #                     Customer_Service_labels, Employment_labels, Fund_labels, Health_Information_labels,
+    #                     Irrelevant_Ads_labels, Life_Comprehend_labels, Products_labels, Products_Service_labels,
+    #                     Recruitment_labels, Sponsored_Events_labels, Survey_Questions_labels,
+    #                     Volunteering_Activity_labels, Website_Issues_labels, General_Mentioned_labels, Stocks_Earnings_labels], 0)
+    return [x_text, np.array(y)]
 
 def padding_sentences(input_sentences, padding_token, padding_sentence_length = None):
     sentences = [sentence.split(' ') for sentence in input_sentences]
