@@ -27,7 +27,7 @@ def embedding_sentences(sentences = None, embedding_size = 128, window = 5, min_
         if file_to_load is not None:
             w2vModel = Word2Vec.load(file_to_load)
         else:
-            w2vModel = Word2Vec(sentences, size = embedding_size, window = window, min_count = min_count, workers = multiprocessing.cpu_count())
+            w2vModel = Word2Vec(sentences, size = embedding_size, window = window, min_count = min_count, workers = multiprocessing.cpu_count(),max_vocab_size=10000)
             if file_to_save is not None:
                 w2vModel.save(file_to_save)
             return all_vectors, w2vModel
