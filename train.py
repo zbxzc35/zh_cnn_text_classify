@@ -41,13 +41,13 @@ tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training d
 #tf.flags.DEFINE_string("Stocks_Earnings_file", "./data/Stocks&Earnings.utf8", "Data source for the Stocks&Earnings data.")
 tf.flags.DEFINE_string("data_dir", "./data/processed/", "Data source for classification.")
 
-tf.flags.DEFINE_integer("num_labels", 21, "Number of labels for data. (default: 2)")
+tf.flags.DEFINE_integer("num_labels", None, "Number of labels for data. (default: None)")
 
 # Model hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 128, "Dimensionality of character embedding (default: 128)")
 tf.flags.DEFINE_string("filter_sizes", "3,4,5", "Comma-spearated filter sizes (default: '3,4,5')")
 tf.flags.DEFINE_integer("num_filters", 128, "Number of filters per filter size (default: 128)")
-tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (default: 0.5)")
+tf.flags.DEFINE_float("dropout_keep_prob", 0.9, "Dropout keep probability (default: 0.5)")
 tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regularization lambda (default: 0.0)")
 
 # Training paramters
