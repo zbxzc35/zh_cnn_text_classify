@@ -96,7 +96,7 @@ else:
     _, w2vModel = word2vec_helpers.embedding_sentences(sentences = None ,
                                                        embedding_size = FLAGS.embedding_dim, file_to_load = _w2v_path)
 
-x = np.array(x_text)
+x = np.array(sentences)
 print("x.shape = {}".format(x.shape))
 print("y.shape = {}".format(y.shape))
 
