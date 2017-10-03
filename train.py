@@ -106,7 +106,6 @@ params = {'num_labels' : FLAGS.num_labels, 'max_document_length' : max_document_
 data_helpers.saveDict(params, training_params_file)
 
 # Shuffle data randomly
-np.random.seed(10)
 shuffle_indices = np.random.permutation(np.arange(len(y)))
 x_shuffled = x[shuffle_indices]
 y_shuffled = y[shuffle_indices]
