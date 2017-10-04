@@ -200,7 +200,7 @@ with tf.Graph().as_default():
             train_step(x_batch, y_batch)
             current_step = tf.train.global_step(sess, global_step)
             if current_step % FLAGS.evaluate_every == 0:
-                shuffle_indices = np.random.permutation(np.arange(len(x_dev)))[:FLAGS.batch_size*4]
+                shuffle_indices = np.random.permutation(np.arange(len(x_dev)))[:FLAGS.batch_size]
                 x_dev_shuffled = x[shuffle_indices]
                 y_dev_shuffled = y[shuffle_indices]
 
