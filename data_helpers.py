@@ -80,14 +80,14 @@ def load_positive_negative_data_files(FLAGS):
 def padding_sentences(input_sentences, padding_token, padding_sentence_length = None):
     sentences = [sentence.split(' ') for sentence in input_sentences]
     max_sentence_length = padding_sentence_length if padding_sentence_length is not None else max([len(sentence) for sentence in sentences])
-    i = 0
+    out = []
     for sentence in sentences:
         if len(sentence) > max_sentence_length:
             sentence = sentence[:max_sentence_length]
         else:
             sentence.extend([padding_token] * (max_sentence_length - len(sentence)))
-        i += 1
-    return (sentences, max_sentence_length)
+        out.append(sentence)
+    return (out, max_sentence_length)
 
 def batch_iter(data, batch_size, num_epochs, shuffle=True):
     '''
