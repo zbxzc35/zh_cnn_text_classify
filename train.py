@@ -14,11 +14,12 @@ from text_cnn import TextCNN
 # =======================================================
 
 # Data loading parameters
-tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training data to use for validation")
+tf.flags.DEFINE_float("dev_sample_percentage", .15, "Percentage of the training data to use for validation")
 
 tf.flags.DEFINE_string("data_dir", "./data/processed/", "Data source for classification.")
 
 tf.flags.DEFINE_integer("num_labels", None, "Number of labels for data. (default: None)")
+tf.flags.DEFINE_integer("max_document_len", None, "Max document lenth. (default: None)")
 
 # Model hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 256, "Dimensionality of character embedding (default: 128)")
@@ -65,7 +66,7 @@ print("Loading data...")
 x_text, y = data_helpers.load_positive_negative_data_files(FLAGS)
 
 # Get embedding vector
-sentences, max_document_length = data_helpers.padding_sentences(x_text, '<PADDING>')
+sentences, max_document_length = data_helpers.padding_sentences(x_text, '<PADDING>',padding_sentence_length=FLAGS.max_document_len)
 if not os.path.exists(_w2v_path):
     _, w2vModel = word2vec_helpers.embedding_sentences(sentences = sentences,
                                                        embedding_size = FLAGS.embedding_dim, file_to_save = _w2v_path)
@@ -100,18 +101,18 @@ print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
 with tf.Graph().as_default():
     session_conf = tf.ConfigProto(
         allow_soft_placement = FLAGS.allow_soft_placement,
-	log_device_placement = FLAGS.log_device_placement)
+        log_device_placement = FLAGS.log_device_placement)
     sess = tf.Session(config = session_conf)
     with sess.as_default():
         cnn = TextCNN(
-	    sequence_length = x_train.shape[1],
-	    num_classes = y_train.shape[1],
-	    embedding_size = FLAGS.embedding_dim,
-	    filter_sizes = list(map(int, FLAGS.filter_sizes.split(","))),
-	    num_filters = FLAGS.num_filters,
-	    l2_reg_lambda = FLAGS.l2_reg_lambda)
+            sequence_length = x_train.shape[1],
+            num_classes = y_train.shape[1],
+            embedding_size = FLAGS.embedding_dim,
+            filter_sizes = list(map(int, FLAGS.filter_sizes.split(","))),
+            num_filters = FLAGS.num_filters,
+            l2_reg_lambda = FLAGS.l2_reg_lambda)
 
-	# Define Training procedure
+        # Define Training procedure
         global_step = tf.Variable(0, name="global_step", trainable=False)
         optimizer = tf.train.AdamOptimizer(1e-3)
         grads_and_vars = optimizer.compute_gradients(cnn.loss)
@@ -159,9 +160,9 @@ with tf.Graph().as_default():
             A single training step
             """
             feed_dict = {
-              cnn.input_x: x_batch,
-              cnn.input_y: y_batch,
-              cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
+                cnn.input_x: x_batch,
+                cnn.input_y: y_batch,
+                cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
             }
             _, step, summaries, loss, accuracy = sess.run(
                 [train_op, global_step, train_summary_op, cnn.loss, cnn.accuracy],
@@ -175,9 +176,9 @@ with tf.Graph().as_default():
             Evaluates model on a dev set
             """
             feed_dict = {
-              cnn.input_x: x_batch,
-              cnn.input_y: y_batch,
-              cnn.dropout_keep_prob: 1.0
+                cnn.input_x: x_batch,
+                cnn.input_y: y_batch,
+                cnn.dropout_keep_prob: 1.0
             }
             step, summaries, loss, accuracy = sess.run(
                 [global_step, dev_summary_op, cnn.loss, cnn.accuracy],

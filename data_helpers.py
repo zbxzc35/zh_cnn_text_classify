@@ -80,11 +80,13 @@ def load_positive_negative_data_files(FLAGS):
 def padding_sentences(input_sentences, padding_token, padding_sentence_length = None):
     sentences = [sentence.split(' ') for sentence in input_sentences]
     max_sentence_length = padding_sentence_length if padding_sentence_length is not None else max([len(sentence) for sentence in sentences])
+    i = 0
     for sentence in sentences:
         if len(sentence) > max_sentence_length:
             sentence = sentence[:max_sentence_length]
         else:
             sentence.extend([padding_token] * (max_sentence_length - len(sentence)))
+        i += 1
     return (sentences, max_sentence_length)
 
 def batch_iter(data, batch_size, num_epochs, shuffle=True):
@@ -96,15 +98,15 @@ def batch_iter(data, batch_size, num_epochs, shuffle=True):
     num_batches_per_epoch = int((data_size - 1) / batch_size) + 1
     for epoch in range(num_epochs):
         if shuffle:
-	    # Shuffle the data at each epoch
-	    shuffle_indices = np.random.permutation(np.arange(data_size))
-	    shuffled_data = data[shuffle_indices]
-	else:
-	    shuffled_data = data
-	for batch_num in range(num_batches_per_epoch):
-	    start_idx = batch_num * batch_size
-	    end_idx = min((batch_num + 1) * batch_size, data_size)
-	    yield shuffled_data[start_idx : end_idx]
+            # Shuffle the data at each epoch
+            shuffle_indices = np.random.permutation(np.arange(data_size))
+            shuffled_data = data[shuffle_indices]
+        else:
+            shuffled_data = data
+        for batch_num in range(num_batches_per_epoch):
+            start_idx = batch_num * batch_size
+            end_idx = min((batch_num + 1) * batch_size, data_size)
+            yield shuffled_data[start_idx : end_idx]
 
 def test():
     # Test clean_str
@@ -159,7 +161,7 @@ def clean_str(string):
 
 def saveDict(input_dict, output_file):
     with open(output_file, 'wb') as f:
-        pickle.dump(input_dict, f) 
+        pickle.dump(input_dict, f)
 
 def loadDict(dict_file):
     output_dict = None
