@@ -78,6 +78,8 @@ if not os.path.exists(_w2v_path):
 else:
     _, w2vModel = word2vec_helpers.embedding_sentences(sentences = None ,
                                                        embedding_size = FLAGS.embedding_dim, file_to_load = _w2v_path)
+FLAGS.embedding_dim = w2vModel.vector_size
+print ('wordembedding.dim = {}'.format(FLAGS.embedding_dim))
 print ('wordembedding.lenth = {}'.format(len(w2vModel.wv.vocab)))
 
 x = np.array(sentences)
