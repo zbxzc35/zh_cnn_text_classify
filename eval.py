@@ -44,7 +44,7 @@ if checkpoint_file is None:
 print("Using checkpoint file : {}".format(checkpoint_file))
 
 # validate word2vec model file
-trained_word2vec_model_file = os.path.join(FLAGS.checkpoint_dir, "..", "trained_word2vec.model")
+trained_word2vec_model_file = os.path.join(FLAGS.checkpoint_dir, "..", FLAGS.wordembedding_name)
 if not os.path.exists(trained_word2vec_model_file):
     print("Word2vec model file \'{}\' doesn't exist!".format(trained_word2vec_model_file))
 print("Using word2vec model file : {}".format(trained_word2vec_model_file))

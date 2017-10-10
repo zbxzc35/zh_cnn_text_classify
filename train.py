@@ -23,8 +23,10 @@ tf.flags.DEFINE_integer("max_document_len", 2500, "Max document lenth. (default:
 
 tf.flags.DEFINE_boolean("word_segment", True, "Whether do word segmentation. (default: False)")
 
+tf.flags.DEFINE_string("wordembedding_name", "zh.bin", "Word embedding model name. (default: trained_word2vec.model)")
+
 # Model hyperparameters
-tf.flags.DEFINE_integer("embedding_dim", 512, "Dimensionality of character embedding (default: 128)")
+tf.flags.DEFINE_integer("embedding_dim", 300, "Dimensionality of character embedding (default: 128)")
 tf.flags.DEFINE_string("filter_sizes", "2,3,4,5", "Comma-spearated filter sizes (default: '3,4,5')")
 tf.flags.DEFINE_integer("num_filters", 128, "Number of filters per filter size (default: 128)")
 tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (default: 0.5)")
@@ -55,7 +57,7 @@ print("")
 
 timestamp = datetime.datetime.now().isoformat()
 out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", timestamp))
-_w2v_path = os.path.join(os.path.curdir, "runs", 'trained_word2vec.model')
+_w2v_path = os.path.join(os.path.curdir, "runs", FLAGS.wordembedding_name)
 print("Writing to {}\n".format(out_dir))
 if not os.path.exists(out_dir):
     os.makedirs(out_dir)
