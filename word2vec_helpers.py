@@ -13,6 +13,7 @@ import time
 import json
  
 from gensim.models import Word2Vec
+from gensim.models import KeyedVectors
 from gensim.models.word2vec import LineSentence
 
 def output_vocab(vocab):
@@ -25,7 +26,12 @@ def embedding_sentences(sentences = None, embedding_size = 128, window = 5, min_
         w2vModel = model
     else:
         if file_to_load is not None:
-            w2vModel = Word2Vec.load(file_to_load)
+            if file_to_load[-4:] != '.vec':
+                #word2vec
+                w2vModel = Word2Vec.load(file_to_load)
+            else:
+                #fasttext
+                w2vModel = KeyedVectors.load_word2vec_format(file_to_load)
         else:
             w2vModel = Word2Vec(sentences, size = embedding_size, window = window, min_count = min_count, workers = multiprocessing.cpu_count())
             if file_to_save is not None:
