@@ -20,7 +20,7 @@ def output_vocab(vocab):
     for k, v in vocab.items():
         print(k)
 
-def embedding_sentences(sentences = None, embedding_size = 128, window = 5, min_count = 5, file_to_load = None, file_to_save = None, model = None):
+def embedding_sentences(sentences = None, embedding_size = 300, window = 5, min_count = 5, file_to_load = None, file_to_save = None, model = None):
     all_vectors = []
     if model is not None:
         w2vModel = model
