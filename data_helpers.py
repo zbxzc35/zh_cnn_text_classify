@@ -10,6 +10,7 @@ import time
 import pickle
 from os import listdir
 from os.path import isfile, join
+import jieba
 
 def load_data_and_labels(input_text_file, input_label_file, num_labels):
     x_text = read_and_clean_zh_file(input_text_file)
@@ -77,8 +78,18 @@ def load_positive_negative_data_files(FLAGS):
     #                     Volunteering_Activity_labels, Website_Issues_labels, General_Mentioned_labels, Stocks_Earnings_labels], 0)
     return [x_text, np.array(y)]
 
-def padding_sentences(input_sentences, padding_token, padding_sentence_length = None):
-    sentences = [sentence.split(' ') for sentence in input_sentences]
+def padding_sentences(input_sentences, padding_token, padding_sentence_length = None, word_segment = False):
+    if not word_segment:
+        sentences = [sentence.split(' ') for sentence in input_sentences]
+    else:
+        sentences = []
+        for sentence in input_sentences:
+            sentence = sentence.replace(' ','')
+            seg_list = jieba.cut(sentence)
+            sentences.append(' '.join(seg_list).split(' '))
+    print sentences[0]
+
+
     max_sentence_length = padding_sentence_length if padding_sentence_length is not None else max([len(sentence) for sentence in sentences])
     out = []
     for sentence in sentences:

@@ -21,6 +21,8 @@ tf.flags.DEFINE_string("data_dir", "./data/processed/", "Data source for classif
 tf.flags.DEFINE_integer("num_labels", None, "Number of labels for data. (default: None)")
 tf.flags.DEFINE_integer("max_document_len", 2500, "Max document lenth. (default: None)")
 
+tf.flags.DEFINE_boolean("word_segment", True, "Whether do word segmentation. (default: False)")
+
 # Model hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 512, "Dimensionality of character embedding (default: 128)")
 tf.flags.DEFINE_string("filter_sizes", "2,3,4,5", "Comma-spearated filter sizes (default: '3,4,5')")
@@ -66,7 +68,8 @@ print("Loading data...")
 x_text, y = data_helpers.load_positive_negative_data_files(FLAGS)
 
 # Get embedding vector
-sentences, max_document_length = data_helpers.padding_sentences(x_text, '<PADDING>',padding_sentence_length=FLAGS.max_document_len)
+sentences, max_document_length = data_helpers.padding_sentences(x_text, '<PADDING>',word_segment= FLAGS.word_segment,
+                                                                padding_sentence_length=FLAGS.max_document_len)
 if not os.path.exists(_w2v_path):
     _, w2vModel = word2vec_helpers.embedding_sentences(sentences = sentences,
                                                        embedding_size = FLAGS.embedding_dim, file_to_save = _w2v_path)
