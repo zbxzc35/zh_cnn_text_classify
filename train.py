@@ -25,7 +25,7 @@ tf.flags.DEFINE_boolean("word_segment", False, "Whether do word segmentation. (d
 
 tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model", "Word embedding model name. (default: trained_word2vec.model)")
 
-tf.flags.DEFINE_boolean("shuffle_data", False, "Whether or not shuffle the data. (default: False)")
+tf.flags.DEFINE_boolean("shuffle_data", True, "Whether or not shuffle the data. (default: False)")
 
 # Model hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 512, "Dimensionality of character embedding (default: 300)")
@@ -184,6 +184,7 @@ with tf.Graph().as_default():
                 feed_dict)
             time_str = datetime.datetime.now().isoformat()
             print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+
             train_summary_writer.add_summary(summaries, step)
 
         def dev_step(x_batch, y_batch, writer=None):
@@ -200,6 +201,7 @@ with tf.Graph().as_default():
                 feed_dict)
             time_str = datetime.datetime.now().isoformat()
             print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+
             if writer:
                 writer.add_summary(summaries, step)
 
