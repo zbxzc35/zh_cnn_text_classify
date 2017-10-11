@@ -69,7 +69,7 @@ class TextCNN(object):
 			l2_loss += tf.nn.l2_loss(W1)
 			l2_loss += tf.nn.l2_loss(b1)
 			self.pos_neg = tf.nn.xw_plus_b(self.h_drop, W1, b1, name="pos_neg")
-			self.pos_neg = tf.nn.relu(self.pos_neg)
+			self.pos_neg = tf.nn.sigmoid(self.pos_neg)
 
 			W2 = tf.get_variable(
 				"W2",
