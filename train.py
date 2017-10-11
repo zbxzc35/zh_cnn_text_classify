@@ -23,7 +23,9 @@ tf.flags.DEFINE_integer("max_document_len", 2500, "Max document lenth. (default:
 
 tf.flags.DEFINE_boolean("word_segment", False, "Whether do word segmentation. (default: False)")
 
-tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model.512", "Word embedding model name. (default: trained_word2vec.model)")
+tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model", "Word embedding model name. (default: trained_word2vec.model)")
+
+tf.flags.DEFINE_boolean("shuffle_data", False, "Whether or not shuffle the data. (default: False)")
 
 # Model hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 512, "Dimensionality of character embedding (default: 300)")
@@ -92,9 +94,13 @@ params = {'num_labels' : FLAGS.num_labels, 'max_document_length' : max_document_
 data_helpers.saveDict(params, training_params_file)
 
 # Shuffle data randomly
-shuffle_indices = np.random.permutation(np.arange(len(y)))
-x_shuffled = x[shuffle_indices]
-y_shuffled = y[shuffle_indices]
+if FLAGS.shuffle_data:
+    shuffle_indices = np.random.permutation(np.arange(len(y)))
+    x_shuffled = x[shuffle_indices]
+    y_shuffled = y[shuffle_indices]
+else:
+    x_shuffled = x
+    y_shuffled = y
 
 # Split train/test set
 # TODO: This is very crude, should use cross-validation
