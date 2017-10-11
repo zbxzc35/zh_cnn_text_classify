@@ -95,6 +95,7 @@ data_helpers.saveDict(params, training_params_file)
 
 # Shuffle data randomly
 if FLAGS.shuffle_data:
+    np.random.seed(10)
     shuffle_indices = np.random.permutation(np.arange(len(y)))
     x_shuffled = x[shuffle_indices]
     y_shuffled = y[shuffle_indices]
@@ -215,6 +216,7 @@ with tf.Graph().as_default():
             train_step(x_batch, y_batch)
             current_step = tf.train.global_step(sess, global_step)
             if current_step % FLAGS.evaluate_every == 0:
+                np.random.seed(None)
                 shuffle_indices = np.random.permutation(np.arange(len(x_dev)))[:FLAGS.batch_size*4]
                 x_dev_shuffled = x[shuffle_indices]
                 y_dev_shuffled = y[shuffle_indices]
