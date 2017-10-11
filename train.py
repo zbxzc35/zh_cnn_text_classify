@@ -133,7 +133,7 @@ with tf.Graph().as_default():
         # Define Training procedure
         global_step = tf.Variable(0, name="global_step", trainable=False)
         optimizer = tf.train.AdamOptimizer(1e-3)
-        grads_and_vars = optimizer.compute_gradients(cnn.loss)
+        grads_and_vars = optimizer.compute_gradients(cnn.training_loss)
         train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
 
         # Keep track of gradient values and sparsity (optional)
@@ -183,7 +183,7 @@ with tf.Graph().as_default():
                 cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
             }
             _, step, summaries, loss, accuracy = sess.run(
-                [train_op, global_step, train_summary_op, cnn.loss, cnn.accuracy],
+                [train_op, global_step, train_summary_op, cnn.training_loss, cnn.training_accuracy],
                 feed_dict)
             time_str = datetime.datetime.now().isoformat()
             print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))

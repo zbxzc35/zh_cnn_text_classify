@@ -86,13 +86,20 @@ class TextCNN(object):
 			# b2 = tf.Variable(tf.constant(0.1, shape=[num_classes], name = "b2"))
 			# self.scores = tf.nn.xw_plus_b(self.pos_neg_neutral, W2, b2, name = "scores")
 			self.predictions = tf.argmax(self.scores, 1, name = "predictions")
-
+			self.training_scores = tf.concat([pos_neg[:, :1], tf.zeros(tf.shape(neutral)), pos_neg[:, 1:]], 1,
+										 name="trainscores")
 		# Calculate Mean cross-entropy loss
 		with tf.name_scope("loss"):
-			losses = tf.nn.softmax_cross_entropy_with_logits(logits = self.scores, labels = self.input_y)
+			training_losses = tf.nn.softmax_cross_entropy_with_logits(logits = self.training_scores, labels = self.input_y)
+			self.training_loss = tf.reduce_mean(training_losses) + l2_reg_lambda * l2_loss
+			losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
 			self.loss = tf.reduce_mean(losses) + l2_reg_lambda * l2_loss
 
 		# Accuracy
 		with tf.name_scope("accuracy"):
 			correct_predictions = tf.equal(self.predictions, tf.argmax(self.input_y, 1))
 			self.accuracy = tf.reduce_mean(tf.cast(correct_predictions, "float"), name = "accuracy")
+
+			self.training_predictions = tf.argmax(self.training_scores, 1, name="predictions")
+			correct_predictions = tf.equal(self.training_predictions, tf.argmax(self.input_y, 1))
+			self.training_accuracy = tf.reduce_mean(tf.cast(correct_predictions, "float"), name = "trainaccuracy")
