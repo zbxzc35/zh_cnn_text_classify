@@ -69,10 +69,9 @@ if not os.path.exists(out_dir):
 
 # Load data
 print("Loading data...")
-x_text, y = data_helpers.load_positive_negative_data_files(FLAGS)
-
+x_train, y_train,x_dev,y_dev = data_helpers.load_positive_negative_data_files(FLAGS)
 # Get embedding vector
-sentences, max_document_length = data_helpers.padding_sentences(x_text, '<PADDING>',word_segment= FLAGS.word_segment,
+sentences, max_document_length = data_helpers.padding_sentences(np.concatenate([x_train,x_dev],axis=0), '<PADDING>',word_segment= FLAGS.word_segment,
                                                                 padding_sentence_length=FLAGS.max_document_len)
 if not os.path.exists(_w2v_path):
     _, w2vModel = word2vec_helpers.embedding_sentences(sentences = sentences,
@@ -80,34 +79,38 @@ if not os.path.exists(_w2v_path):
 else:
     _, w2vModel = word2vec_helpers.embedding_sentences(sentences = None ,
                                                        embedding_size = FLAGS.embedding_dim, file_to_load = _w2v_path)
+
 FLAGS.embedding_dim = w2vModel.vector_size
 print ('wordembedding.dim = {}'.format(FLAGS.embedding_dim))
 print ('wordembedding.lenth = {}'.format(len(w2vModel.wv.vocab)))
 
 x = np.array(sentences)
-print("x.shape = {}".format(x.shape))
-print("y.shape = {}".format(y.shape))
+x_train = x[:len(x_train)]
+x_dev   = x[len(x_train):]
+y = np.concatenate([y_train,y_dev],axis=0)
+print("x.shape = {}".format(x_train.shape))
+print("y.shape = {}".format(y_train.shape))
 
 # Save params
 training_params_file = os.path.join(out_dir, 'training_params.pickle')
 params = {'num_labels' : FLAGS.num_labels, 'max_document_length' : max_document_length}
 data_helpers.saveDict(params, training_params_file)
 
-# Shuffle data randomly
-if FLAGS.shuffle_data:
-    np.random.seed(10)
-    shuffle_indices = np.random.permutation(np.arange(len(y)))
-    x_shuffled = x[shuffle_indices]
-    y_shuffled = y[shuffle_indices]
-else:
-    x_shuffled = x
-    y_shuffled = y
+# # Shuffle data randomly
+# if FLAGS.shuffle_data:
+#     np.random.seed(10)
+#     shuffle_indices = np.random.permutation(np.arange(len(y)))
+#     x_shuffled = x[shuffle_indices]
+#     y_shuffled = y[shuffle_indices]
+# else:
+#     x_shuffled = x
+#     y_shuffled = y
 
 # Split train/test set
 # TODO: This is very crude, should use cross-validation
-dev_sample_index = -1 * int(FLAGS.dev_sample_percentage * float(len(y)))
-x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
-y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
+# dev_sample_index = -1 * int(FLAGS.dev_sample_percentage * float(len(y)))
+# x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
+# y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
 print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
 
 # Training
@@ -120,8 +123,8 @@ with tf.Graph().as_default():
     sess = tf.Session(config = session_conf)
     with sess.as_default():
         cnn = TextCNN(
-            sequence_length = x_train.shape[1],
-            num_classes = y_train.shape[1],
+            sequence_length = x.shape[1],
+            num_classes = y.shape[1],
             embedding_size = FLAGS.embedding_dim,
             filter_sizes = list(map(int, FLAGS.filter_sizes.split(","))),
             num_filters = FLAGS.num_filters,

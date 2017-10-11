@@ -46,29 +46,59 @@ def load_positive_negative_data_files(FLAGS):
     # General_Mentioned_examples     = read_and_clean_zh_file(FLAGS.General_Mentioned_file)
     # Stocks_Earnings_examples       = read_and_clean_zh_file(FLAGS.Stocks_Earnings_file)
     mypath = FLAGS.data_dir
-    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+    #training
+    onlyfiles = [f for f in listdir(mypath+'training') if isfile(join(mypath+'training', f))]
     FLAGS.num_labels = len(onlyfiles)
 
     # Combine data
     examples = []
     for i in range(len(onlyfiles)):
-        examples.append(read_and_clean_zh_file(mypath + onlyfiles[i]))
-        if i == 0:
-            x_text = examples[i][:]
-        else:
-            x_text += examples[i][:]
+        print mypath+'training/' + onlyfiles[i]
 
+        examples.append(read_and_clean_zh_file(mypath+'training/' + onlyfiles[i]))
+        if os.stat(mypath+'training/' + onlyfiles[i]).st_size == 0:
+            continue
+        if i == 0:
+            x_training = examples[i][:]
+        else:
+            x_training += examples[i][:]
 
 
 
     # Generate labels
     I = np.eye(len(onlyfiles), dtype=int)
     for i in range(len(onlyfiles)):
+        if os.stat(mypath+'training/' + onlyfiles[i]).st_size == 0:
+            continue
         if i == 0:
-            y = [I[i] for _ in examples[i]]
+            y_training = [I[i] for _ in examples[i]]
         else:
-            y += [I[i] for _ in examples[i]]
+            y_training += [I[i] for _ in examples[i]]
 
+    # testing
+    onlyfiles = [f for f in listdir(mypath + 'testing') if isfile(join(mypath+'testing', f))]
+    FLAGS.num_labels = len(onlyfiles)
+
+    # Combine data
+    examples = []
+    for i in range(len(onlyfiles)):
+        if os.stat(mypath+ 'testing/' + onlyfiles[i]).st_size == 0:
+            continue
+        examples.append(read_and_clean_zh_file(mypath+ 'testing/' + onlyfiles[i]))
+        if i == 0:
+            x_testing = examples[i][:]
+        else:
+            x_testing += examples[i][:]
+
+    # Generate labels
+    I = np.eye(len(onlyfiles), dtype=int)
+    for i in range(len(onlyfiles)):
+        if os.stat(mypath+ 'testing/' + onlyfiles[i]).st_size == 0:
+            continue
+        if i == 0:
+            y_testing = [I[i] for _ in examples[i]]
+        else:
+            y_testing += [I[i] for _ in examples[i]]
 
     # y = np.concatenate([Ads_Marketing_labels, Agent_Issues_labels, Charity_Events_labels,
     #                     Contact_Information_labels, Corporate_Brand_labels, Corporate_News_labels,
@@ -76,7 +106,7 @@ def load_positive_negative_data_files(FLAGS):
     #                     Irrelevant_Ads_labels, Life_Comprehend_labels, Products_labels, Products_Service_labels,
     #                     Recruitment_labels, Sponsored_Events_labels, Survey_Questions_labels,
     #                     Volunteering_Activity_labels, Website_Issues_labels, General_Mentioned_labels, Stocks_Earnings_labels], 0)
-    return [x_text, np.array(y)]
+    return [np.array(x_training), np.array(y_training),np.array(x_testing), np.array(y_testing)]
 
 def padding_sentences(input_sentences, padding_token, padding_sentence_length = None, word_segment = False):
     if not word_segment:
