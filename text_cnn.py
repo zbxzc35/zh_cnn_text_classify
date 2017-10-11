@@ -68,17 +68,23 @@ class TextCNN(object):
 			b1 = tf.Variable(tf.constant(0.1, shape=[2], name = "b1"))
 			l2_loss += tf.nn.l2_loss(W1)
 			l2_loss += tf.nn.l2_loss(b1)
-			self.pos_neg = tf.nn.xw_plus_b(self.h_drop, W1, b1, name="pos_neg")
-			self.pos_neg = tf.nn.softmax(self.pos_neg)
+			pos_neg = tf.nn.xw_plus_b(self.h_drop, W1, b1, name="pos_neg")
+			pos_neg = tf.nn.softmax(pos_neg)
 
-			W2 = tf.get_variable(
-				"W2",
-				shape = [2, num_classes],
-				initializer = tf.contrib.layers.xavier_initializer())
-			b2 = tf.Variable(tf.constant(0.1, shape=[num_classes], name = "b2"))
-			l2_loss += tf.nn.l2_loss(W2)
-			l2_loss += tf.nn.l2_loss(b2)
-			self.scores = tf.nn.xw_plus_b(self.pos_neg, W2, b2, name = "scores")
+
+
+
+			neutral = tf.multiply(pos_neg[:,:1],pos_neg[:,1:])
+
+			neutral = tf.add(neutral, 0.75)
+			self.scores = tf.concat([pos_neg[:,:1],neutral, pos_neg[:,1:]],1, name="scores")
+
+			# W2 = tf.get_variable(
+			# 	"W2",
+			# 	shape = [3, num_classes],
+			# 	initializer = tf.contrib.layers.xavier_initializer())
+			# b2 = tf.Variable(tf.constant(0.1, shape=[num_classes], name = "b2"))
+			# self.scores = tf.nn.xw_plus_b(self.pos_neg_neutral, W2, b2, name = "scores")
 			self.predictions = tf.argmax(self.scores, 1, name = "predictions")
 
 		# Calculate Mean cross-entropy loss
