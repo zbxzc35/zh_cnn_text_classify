@@ -68,15 +68,14 @@ class TextCNN(object):
 			b1 = tf.Variable(tf.constant(0.1, shape=[2], name = "b1"))
 			l2_loss += tf.nn.l2_loss(W1)
 			l2_loss += tf.nn.l2_loss(b1)
-			pos_neg = tf.nn.xw_plus_b(self.h_drop, W1, b1, name="pos_neg")
-			pos_neg = tf.nn.softmax(pos_neg)
+			pos_neg_var = tf.nn.xw_plus_b(self.h_drop, W1, b1, name="pos_neg")
+			pos_neg = tf.nn.softmax(pos_neg_var)
 
-
-
-
-			neutral = tf.multiply(pos_neg[:,:1],pos_neg[:,1:])
-
-			neutral = tf.multiply(neutral, 4)
+		with tf.name_scope("neutral"):
+			multi_pos_neg = tf.multiply(pos_neg[:,:1],pos_neg[:,1:])
+			self.W2 = tf.Variable(tf.constant(4., shape=[1], name="W2"))
+			self.b2 = tf.Variable(tf.constant(0.1, shape=[1], name="b2"))
+			neutral = tf.add(tf.multiply(multi_pos_neg, self.W2), self.b2, name="pos_neg")
 			self.scores = tf.concat([pos_neg[:,:1],neutral, pos_neg[:,1:]],1, name="scores")
 
 			# W2 = tf.get_variable(
@@ -90,10 +89,11 @@ class TextCNN(object):
 										 name="trainscores")
 		# Calculate Mean cross-entropy loss
 		with tf.name_scope("loss"):
-			training_losses = tf.nn.softmax_cross_entropy_with_logits(logits = self.training_scores, labels = self.input_y)
-			self.training_loss = tf.reduce_mean(training_losses) + l2_reg_lambda * l2_loss
 			losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
 			self.loss = tf.reduce_mean(losses) + l2_reg_lambda * l2_loss
+
+			losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.training_scores, labels=self.input_y)
+			self.training_loss = tf.reduce_mean(losses) + l2_reg_lambda * l2_loss
 
 		# Accuracy
 		with tf.name_scope("accuracy"):
