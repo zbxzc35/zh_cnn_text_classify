@@ -90,7 +90,7 @@ def load_positive_negative_data_files(FLAGS):
         else:
             y_testing += [I[i] for _ in example[i]]
 
-
+    
     # y = np.concatenate([Ads_Marketing_labels, Agent_Issues_labels, Charity_Events_labels,
     #                     Contact_Information_labels, Corporate_Brand_labels, Corporate_News_labels,
     #                     Customer_Service_labels, Employment_labels, Fund_labels, Health_Information_labels,

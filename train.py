@@ -14,7 +14,7 @@ from text_cnn import TextCNN
 # =======================================================
 
 # Data loading parameters
-tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training data to use for validation")
+tf.flags.DEFINE_float("dev_sample_percentage", .15, "Percentage of the training data to use for validation")
 
 tf.flags.DEFINE_string("data_dir", "./data/processed/", "Data source for classification.")
 
@@ -114,9 +114,15 @@ y_shuffled = y_dev[shuffle_indices]
 
 # Split train/test set
 # TODO: This is very crude, should use cross-validation
-dev_sample_index = -1 * int(FLAGS.dev_sample_percentage * float(len(y)))
+dev_sample_index = -1 * int(FLAGS.dev_sample_percentage * float(len(y_dev)))
 x_dev, x_test = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
 y_dev, y_test = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
+
+x_dev = np.concatenate([x_dev, x_train[-5000:]])
+y_dev = np.concatenate([y_dev, y_train[-5000:]])
+
+x_train = x_train[:-5000]
+y_train = y_train[:-5000]
 print("Train/Dev/Test split: {:d}/{:d}/{:d}".format(len(y_train), len(y_dev), len(y_test)))
 
 _dev_per = 10
@@ -197,7 +203,7 @@ with tf.Graph().as_default():
                 cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
             }
             _, step, summaries, loss, accuracy = sess.run(
-                [train_op, global_step, train_summary_op, cnn.loss, cnn.training_accuracy],
+                [train_op, global_step, train_summary_op, cnn.training_loss, cnn.training_accuracy],
                 feed_dict)
             time_str = datetime.datetime.now().isoformat()
             print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
@@ -213,13 +219,11 @@ with tf.Graph().as_default():
                 cnn.input_y: y_batch,
                 cnn.dropout_keep_prob: 1.0
             }
-            _, step, summaries, loss, accuracy, w2, b2 = sess.run(
-                [train_dev,global_step, dev_summary_op, cnn.loss, cnn.accuracy,cnn.W2,cnn.b2],
+            _, step, summaries, loss, accuracy = sess.run(
+                [train_dev,global_step, dev_summary_op, cnn.loss, cnn.accuracy],
                 feed_dict)
             time_str = datetime.datetime.now().isoformat()
             print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
-            print w2
-            print b2
 
             if writer:
                 writer.add_summary(summaries, step)
@@ -233,11 +237,13 @@ with tf.Graph().as_default():
                 cnn.input_y: y_batch,
                 cnn.dropout_keep_prob: 1.0
             }
-            step, summaries, loss, accuracy = sess.run(
-                [global_step, dev_summary_op, cnn.loss, cnn.accuracy],
+            step, summaries, loss, accuracy, prediction = sess.run(
+                [global_step, dev_summary_op, cnn.loss, cnn.accuracy, cnn.predictions],
                 feed_dict)
             time_str = datetime.datetime.now().isoformat()
             print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+            print [elem.argmax() for elem in y_batch]
+            print [elem for elem in prediction]
 
             if writer:
                 writer.add_summary(summaries, step)
@@ -254,19 +260,7 @@ with tf.Graph().as_default():
             x_batch = np.array(x_batch_embedding)
             train_step(x_batch, y_batch)
             current_step = tf.train.global_step(sess, global_step)
-            #test
-            if current_step % FLAGS.evaluate_every == 0:
-                np.random.seed(None)
-                shuffle_indices = np.random.permutation(np.arange(len(x_test)))[:FLAGS.batch_size*4]
-                x_test_shuffled = x_test[shuffle_indices]
-                y_test_shuffled = y_test[shuffle_indices]
 
-                x_batch_embedding, _ = word2vec_helpers.embedding_sentences(sentences= x_dev_shuffled, embedding_size=FLAGS.embedding_dim,
-                                                                            file_to_load=_w2v_path, model=w2vModel)
-                x_test_batch = np.array(x_batch_embedding)
-                print("\nTesting:")
-                test_step(x_test_batch, y_test_shuffled, writer=dev_summary_writer)
-                print("")
             #dev
             if current_step % _dev_per == 0:
                 np.random.seed(None)
@@ -280,7 +274,20 @@ with tf.Graph().as_default():
                 print("\nEvaluation:")
                 dev_step(x_dev_batch, y_dev_shuffled)
                 print("")
+                # test
+                if current_step % FLAGS.evaluate_every == 0:
+                    np.random.seed(None)
+                    shuffle_indices = np.random.permutation(np.arange(len(x_test)))[:FLAGS.batch_size * 4]
+                    x_test_shuffled = x_test[shuffle_indices]
+                    y_test_shuffled = y_test[shuffle_indices]
 
+                    x_batch_embedding, _ = word2vec_helpers.embedding_sentences(sentences=x_dev_shuffled,
+                                                                                embedding_size=FLAGS.embedding_dim,
+                                                                                file_to_load=_w2v_path, model=w2vModel)
+                    x_test_batch = np.array(x_batch_embedding)
+                    print("\nTesting:")
+                    test_step(x_test_batch, y_test_shuffled, writer=dev_summary_writer)
+                    print("")
             if current_step % FLAGS.checkpoint_every == 0:
                 path = saver.save(sess, checkpoint_prefix, global_step=current_step)
                 print("Saved model checkpoint to {}\n".format(path))
