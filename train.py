@@ -143,8 +143,8 @@ with tf.Graph().as_default():
         optimizer = tf.train.AdamOptimizer(1e-3)
         grads_and_vars_train = optimizer.compute_gradients(cnn.training_loss)
         grads_and_vars_dev = optimizer.compute_gradients(cnn.loss)
-        print grads_and_vars_train[:-2]
-        print grads_and_vars_dev[-2:]
+        print grads_and_vars_train
+        print grads_and_vars_dev[-2]
 
         train_op = optimizer.apply_gradients(grads_and_vars_train[:-2], global_step=global_step)
         train_dev = optimizer.apply_gradients(grads_and_vars_dev[-2:], global_step=global_step)

@@ -74,7 +74,7 @@ class TextCNN(object):
 		with tf.name_scope("neutral"):
 			multi_pos_neg = tf.multiply(pos_neg[:,:1],pos_neg[:,1:])
 			self.W2 = tf.Variable(tf.constant(4., shape=[1], name="W2"))
-			self.b2 = tf.Variable(tf.constant(0.1, shape=[1], name="b2"))
+			self.b2 = tf.Variable(tf.constant(0.5, shape=[1], name="b2"))
 			neutral = tf.add(tf.multiply(multi_pos_neg, self.W2), self.b2, name="pos_neg")
 			self.scores = tf.concat([pos_neg[:,:1],neutral, pos_neg[:,1:]],1, name="scores")
 
