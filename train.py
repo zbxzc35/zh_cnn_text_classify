@@ -118,11 +118,11 @@ dev_sample_index = -1 * int(FLAGS.dev_sample_percentage * float(len(y_dev)))
 x_dev, x_test = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
 y_dev, y_test = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
 
-x_dev = np.concatenate([x_dev, x_train[-5000:]])
-y_dev = np.concatenate([y_dev, y_train[-5000:]])
+x_dev = np.concatenate([x_dev, x_train[-1000:]])
+y_dev = np.concatenate([y_dev, y_train[-1000:]])
 
-x_train = x_train[:-5000]
-y_train = y_train[:-5000]
+x_train = x_train[:-1000]
+y_train = y_train[:-1000]
 print("Train/Dev/Test split: {:d}/{:d}/{:d}".format(len(y_train), len(y_dev), len(y_test)))
 
 _dev_per = 10
@@ -153,7 +153,7 @@ with tf.Graph().as_default():
         print grads_and_vars_dev[-2]
 
         train_op = optimizer.apply_gradients(grads_and_vars_train[:-2], global_step=global_step)
-        train_dev = optimizer.apply_gradients(grads_and_vars_dev[-2:], global_step=global_step)
+        train_dev = optimizer.apply_gradients(grads_and_vars_dev[-4:], global_step=global_step)
 
 
         # Keep track of gradient values and sparsity (optional)
