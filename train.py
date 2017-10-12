@@ -215,9 +215,9 @@ with tf.Graph().as_default():
 
                 x_batch_embedding, _ = word2vec_helpers.embedding_sentences(sentences= x_dev_shuffled, embedding_size=FLAGS.embedding_dim,
                                                                             file_to_load=_w2v_path, model=w2vModel)
-                x_dev = np.array(x_batch_embedding)
+                x_dev_shuffled = np.array(x_batch_embedding)
                 print("\nEvaluation:")
-                dev_step(x_dev, y_dev_shuffled, writer=dev_summary_writer)
+                dev_step(x_dev_shuffled, y_dev_shuffled, writer=dev_summary_writer)
                 print("")
             if current_step % FLAGS.checkpoint_every == 0:
                 path = saver.save(sess, checkpoint_prefix, global_step=current_step)
