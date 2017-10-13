@@ -70,14 +70,34 @@ def load_positive_negative_data_files(FLAGS):
         else:
             y_training += [I[i] for _ in example[i]]
 
+    # validation
+
+
+    # Combine data
+    example = []
+    example.append(read_and_clean_zh_file(mypath + 'validation/' + FLAGS.positive_data_file))
+    x_validation = example[0][:]
+    example.append(read_and_clean_zh_file(mypath + 'validation/' + FLAGS.neutral_data_file))
+    x_validation += example[1][:]
+    example.append(read_and_clean_zh_file(mypath + 'validation/' + FLAGS.negative_data_file))
+    x_validation += example[2][:]
+
+    # Generate labels
+    for i in range(3):
+
+        if i == 0:
+            y_validation = [I[i] for _ in example[i]]
+        else:
+            y_validation += [I[i] for _ in example[i]]
+
     # testing
 
 
     # Combine data
     example = []
-    example.append(read_and_clean_zh_file(mypath+'testing/' + FLAGS.positive_data_file))
+    example.append(read_and_clean_zh_file(mypath + 'testing/' + FLAGS.positive_data_file))
     x_testing = example[0][:]
-    example.append(read_and_clean_zh_file(mypath+'testing/' + FLAGS.neutral_data_file))
+    example.append(read_and_clean_zh_file(mypath + 'testing/' + FLAGS.neutral_data_file))
     x_testing += example[1][:]
     example.append(read_and_clean_zh_file(mypath + 'testing/' + FLAGS.negative_data_file))
     x_testing += example[2][:]
@@ -97,7 +117,7 @@ def load_positive_negative_data_files(FLAGS):
     #                     Irrelevant_Ads_labels, Life_Comprehend_labels, Products_labels, Products_Service_labels,
     #                     Recruitment_labels, Sponsored_Events_labels, Survey_Questions_labels,
     #                     Volunteering_Activity_labels, Website_Issues_labels, General_Mentioned_labels, Stocks_Earnings_labels], 0)
-    return [np.array(x_training), np.array(y_training),np.array(x_testing), np.array(y_testing)]
+    return [np.array(x_training), np.array(y_training),np.array(x_validation), np.array(y_validation),np.array(x_testing), np.array(y_testing)]
 
 def padding_sentences(input_sentences, padding_token, padding_sentence_length = None, word_segment = False):
     if not word_segment:
