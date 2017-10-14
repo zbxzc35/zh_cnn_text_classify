@@ -16,7 +16,7 @@ from text_cnn import TextCNN
 # Data loading parameters
 tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training data to use for validation")
 
-tf.flags.DEFINE_string("data_dir", "./data/processed/", "Data source for classification.")
+tf.flags.DEFINE_string("data_dir", "./data/processed/training/", "Data source for classification.")
 
 tf.flags.DEFINE_integer("num_labels", None, "Number of labels for data. (default: None)")
 tf.flags.DEFINE_integer("max_document_len", 2500, "Max document lenth. (default: None)")
@@ -188,11 +188,13 @@ with tf.Graph().as_default():
                 cnn.input_y: y_batch,
                 cnn.dropout_keep_prob: 1.0
             }
-            step, summaries, loss, accuracy = sess.run(
-                [global_step, dev_summary_op, cnn.loss, cnn.accuracy],
+            step, summaries, loss, accuracy, predictions = sess.run(
+                [global_step, dev_summary_op, cnn.loss, cnn.accuracy, cnn.predictions],
                 feed_dict)
             time_str = datetime.datetime.now().isoformat()
             print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+            print [x.argmax() for x in y_batch]
+            print [x for x in predictions]
             if writer:
                 writer.add_summary(summaries, step)
 
@@ -210,8 +212,8 @@ with tf.Graph().as_default():
             current_step = tf.train.global_step(sess, global_step)
             if current_step % FLAGS.evaluate_every == 0:
                 shuffle_indices = np.random.permutation(np.arange(len(x_dev)))[:FLAGS.batch_size*4]
-                x_dev_shuffled = x[shuffle_indices]
-                y_dev_shuffled = y[shuffle_indices]
+                x_dev_shuffled = x_dev[shuffle_indices]
+                y_dev_shuffled = y_dev[shuffle_indices]
 
                 x_batch_embedding, _ = word2vec_helpers.embedding_sentences(sentences= x_dev_shuffled, embedding_size=FLAGS.embedding_dim,
                                                                             file_to_load=_w2v_path, model=w2vModel)
