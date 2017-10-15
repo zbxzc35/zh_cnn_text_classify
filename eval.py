@@ -3,8 +3,8 @@
 import tensorflow as tf
 import numpy as np
 import os
-import time
-import datetime
+from os import listdir
+from os.path import isfile, join
 import data_helpers
 import word2vec_helpers
 from text_cnn import TextCNN
@@ -13,15 +13,17 @@ import csv
 
 # Parameters
 # ==================================================
-
+#all 24 catigories :2017-10-05T07:04:31.212577,model.512
+#2 catigories 98.3: 2017-10-14T07:06:27.827187
+#2 catigories 98.4: 2017-10-14T13:26:17.814401
 # Data Parameters
 tf.flags.DEFINE_string("data_dir", "./data/processed/testing/", "Test text data source to evaluate.")
 
 # Eval Parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_string("checkpoint_dir", "./runs/2017-10-14T07:06:27.827187/checkpoints/", "Checkpoint directory from training run")
+tf.flags.DEFINE_string("checkpoint_dir", "./runs/2017-10-05T07:04:31.212577/checkpoints/", "Checkpoint directory from training run")
 tf.flags.DEFINE_boolean("eval_train", True, "Evaluate on all training data")
-tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model", "Word embedding model name. (default: trained_word2vec.model)")
+tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model.512", "Word embedding model name. (default: trained_word2vec.model)")
 
 # Misc Parameters
 tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
@@ -114,14 +116,18 @@ with graph.as_default():
 
 # Print accuracy if y_test is defined
 if y_test is not None:
-    y_vect = np.array([x.argmax() for x in y_test])
+    onlyfiles = [f for f in listdir(FLAGS.data_dir) if isfile(join(FLAGS.data_dir, f))]
+    lable_dict = {i: word.split('.')[0] for i, word in enumerate(onlyfiles)}
+    print lable_dict
+    y_vect = np.array([lable_dict[x.argmax()] for x in y_test])
+    all_predictions = np.array([lable_dict[int(x)] for x in all_predictions])
     correct_predictions = float(np.sum(all_predictions == y_vect))
 
     print("Total number of test examples: {}".format(len(y_test)))
     print("Accuracy: {:g}".format(correct_predictions/float(len(y_test))))
 
 # Save the evaluation to a csv
-predictions_human_readable = np.asarray([np.array([text.encode('utf-8') for text in x_raw]), all_predictions, y_vect])
+predictions_human_readable = np.asarray([np.array([text.encode('utf-8') for text in x_raw]), y_vect, all_predictions])
 print predictions_human_readable.shape
 out_path = os.path.join(FLAGS.checkpoint_dir, "..", "prediction.csv")
 print("Saving evaluation to {0}".format(out_path))
