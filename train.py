@@ -23,14 +23,14 @@ tf.flags.DEFINE_integer("max_document_len", 140, "Max document lenth. (default: 
 
 tf.flags.DEFINE_boolean("word_segment", False, "Whether do word segmentation. (default: False)")
 
-tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model", "Word embedding model name. (default: trained_word2vec.model)")
+tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model.512", "Word embedding model name. (default: trained_word2vec.model)")
 
 # Model hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 512, "Dimensionality of character embedding (default: 300)")
 tf.flags.DEFINE_string("filter_sizes", "2,3,4,5", "Comma-spearated filter sizes (default: '2,3,4,5')")
 tf.flags.DEFINE_integer("num_filters", 256, "Number of filters per filter size (default: 128)")
 tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (default: 0.5)")
-tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regularization lambda (default: 0.0)")
+tf.flags.DEFINE_float("l2_reg_lambda", 3.0, "L2 regularization lambda (default: 0.0)")
 
 # Training paramters
 tf.flags.DEFINE_integer("batch_size", 512, "Batch Size (default: 64)")
