@@ -19,11 +19,11 @@ tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training d
 tf.flags.DEFINE_string("data_dir", "./data/processed/training/", "Data source for classification.")
 
 tf.flags.DEFINE_integer("num_labels", None, "Number of labels for data. (default: None)")
-tf.flags.DEFINE_integer("max_document_len", 2500, "Max document lenth. (default: None)")
+tf.flags.DEFINE_integer("max_document_len", 140, "Max document lenth. (default: None)")
 
 tf.flags.DEFINE_boolean("word_segment", False, "Whether do word segmentation. (default: False)")
 
-tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model.512", "Word embedding model name. (default: trained_word2vec.model)")
+tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model", "Word embedding model name. (default: trained_word2vec.model)")
 
 # Model hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 512, "Dimensionality of character embedding (default: 300)")
@@ -33,7 +33,7 @@ tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (defau
 tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regularization lambda (default: 0.0)")
 
 # Training paramters
-tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
+tf.flags.DEFINE_integer("batch_size", 512, "Batch Size (default: 64)")
 tf.flags.DEFINE_integer("num_epochs", 200, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("evaluate_every", 100, "Evalue model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 100, "Save model after this many steps (defult: 100)")
