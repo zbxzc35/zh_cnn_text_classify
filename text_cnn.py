@@ -61,46 +61,22 @@ class TextCNN(object):
 
         # Final (unnomalized) scores and predictions
         with tf.name_scope("output"):
-            W1 = tf.get_variable(
-                "W1",
-                shape=[num_filters_total, 2],
+            W = tf.get_variable(
+                "W",
+                shape=[num_filters_total, num_classes],
                 initializer=tf.contrib.layers.xavier_initializer())
-            b1 = tf.Variable(tf.constant(0.1, shape=[2], name="b1"))
-            l2_loss += tf.nn.l2_loss(W1)
-            l2_loss += tf.nn.l2_loss(b1)
-            pos_neg = tf.nn.xw_plus_b(self.h_drop, W1, b1, name="pos_neg")
-        # pos_neg = tf.nn.softmax(pos_neg_var)
-
-        with tf.name_scope("neutral"):
-            # multi_pos_neg = tf.multiply(pos_neg[:,:1],pos_neg[:,1:])
-            # self.W2 = tf.Variable(tf.constant(4., shape=[1], name="W2"))
-            # self.b2 = tf.Variable(tf.constant(0.5, shape=[1], name="b2"))
-            # neutral = tf.add(tf.multiply(multi_pos_neg, self.W2), self.b2, name="pos_neg")
-            # self.scores = tf.concat([pos_neg[:,:1],neutral, pos_neg[:,1:]],1, name="scores")
-
-            W2 = tf.get_variable(
-                "W2",
-                shape=[num_filters_total, 1],
-                initializer=tf.contrib.layers.xavier_initializer())
-            b2 = tf.Variable(tf.constant(0.1, shape=[1], name="b2"))
-            neutral = tf.nn.xw_plus_b(self.h_drop, W2, b2, name="scores")
-            self.scores = tf.concat([pos_neg[:, :1], neutral, pos_neg[:, 1:]], 1, name="scores")
+            b = tf.Variable(tf.constant(0.1, shape=[num_classes], name="b"))
+            l2_loss += tf.nn.l2_loss(W)
+            l2_loss += tf.nn.l2_loss(b)
+            self.scores = tf.nn.xw_plus_b(self.h_drop, W, b, name="scores")
             self.predictions = tf.argmax(self.scores, 1, name="predictions")
-            self.training_scores = tf.concat([pos_neg[:, :1], tf.zeros(tf.shape(neutral)), pos_neg[:, 1:]], 1,
-                                             name="trainscores")
+
         # Calculate Mean cross-entropy loss
         with tf.name_scope("loss"):
             losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
             self.loss = tf.reduce_mean(losses) + l2_reg_lambda * l2_loss
 
-            losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.training_scores, labels=self.input_y)
-            self.training_loss = tf.reduce_mean(losses) + l2_reg_lambda * l2_loss
-
         # Accuracy
         with tf.name_scope("accuracy"):
             correct_predictions = tf.equal(self.predictions, tf.argmax(self.input_y, 1))
             self.accuracy = tf.reduce_mean(tf.cast(correct_predictions, "float"), name="accuracy")
-
-            self.training_predictions = tf.argmax(self.training_scores, 1, name="predictions")
-            correct_predictions = tf.equal(self.training_predictions, tf.argmax(self.input_y, 1))
-            self.training_accuracy = tf.reduce_mean(tf.cast(correct_predictions, "float"), name="trainaccuracy")

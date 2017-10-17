@@ -46,58 +46,37 @@ def load_positive_negative_data_files(FLAGS):
     # General_Mentioned_examples     = read_and_clean_zh_file(FLAGS.General_Mentioned_file)
     # Stocks_Earnings_examples       = read_and_clean_zh_file(FLAGS.Stocks_Earnings_file)
     mypath = FLAGS.data_dir
-    #training
-
+    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+    FLAGS.num_labels = len(onlyfiles)
 
     # Combine data
-    example = []
-    example.append(read_and_clean_zh_file(mypath+'training/' + FLAGS.positive_data_file))
-    x_training = example[0][:]
-    example.append(read_and_clean_zh_file(mypath+'training/' + FLAGS.neutral_data_file))
-    x_training += example[1][:]
-    example.append(read_and_clean_zh_file(mypath + 'training/' + FLAGS.negative_data_file))
-    x_training += example[2][:]
+    examples = []
+    for i in range(len(onlyfiles)):
+        examples.append(read_and_clean_zh_file(mypath + onlyfiles[i]))
+        if i == 0:
+            x_text = examples[i][:]
+        else:
+            x_text += examples[i][:]
+
 
 
 
     # Generate labels
-    I = np.eye(3, dtype=int)
-    for i in range(3):
-        # if os.stat(mypath+'training/' + onlyfiles[i]).st_size == 0:
-        #     continue
+    I = np.eye(len(onlyfiles), dtype=int)
+    for i in range(len(onlyfiles)):
         if i == 0:
-            y_training = [I[i] for _ in example[i]]
+            y = [I[i] for _ in examples[i]]
         else:
-            y_training += [I[i] for _ in example[i]]
-
-    # testing
+            y += [I[i] for _ in examples[i]]
 
 
-    # Combine data
-    example = []
-    example.append(read_and_clean_zh_file(mypath+'testing/' + FLAGS.positive_data_file))
-    x_testing = example[0][:]
-    example.append(read_and_clean_zh_file(mypath+'testing/' + FLAGS.neutral_data_file))
-    x_testing += example[1][:]
-    example.append(read_and_clean_zh_file(mypath + 'testing/' + FLAGS.negative_data_file))
-    x_testing += example[2][:]
-
-    # Generate labels
-    for i in range(3):
-
-        if i == 0:
-            y_testing = [I[i] for _ in example[i]]
-        else:
-            y_testing += [I[i] for _ in example[i]]
-
-    
     # y = np.concatenate([Ads_Marketing_labels, Agent_Issues_labels, Charity_Events_labels,
     #                     Contact_Information_labels, Corporate_Brand_labels, Corporate_News_labels,
     #                     Customer_Service_labels, Employment_labels, Fund_labels, Health_Information_labels,
     #                     Irrelevant_Ads_labels, Life_Comprehend_labels, Products_labels, Products_Service_labels,
     #                     Recruitment_labels, Sponsored_Events_labels, Survey_Questions_labels,
     #                     Volunteering_Activity_labels, Website_Issues_labels, General_Mentioned_labels, Stocks_Earnings_labels], 0)
-    return [np.array(x_training), np.array(y_training),np.array(x_testing), np.array(y_testing)]
+    return [x_text, np.array(y)]
 
 def padding_sentences(input_sentences, padding_token, padding_sentence_length = None, word_segment = False):
     if not word_segment:
