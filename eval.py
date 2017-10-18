@@ -21,9 +21,10 @@ tf.flags.DEFINE_string("data_dir", "./data/processed/testing/", "Test text data 
 
 # Eval Parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_string("checkpoint_dir", "./runs/2017-10-17T08:04:46.534566/checkpoints/", "Checkpoint directory from training run")
+tf.flags.DEFINE_string("checkpoint_dir", "./runs/2017-10-17T20:48:02.481335/checkpoints/", "Checkpoint directory from training run")
 tf.flags.DEFINE_boolean("eval_train", True, "Evaluate on all training data")
-tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model", "Word embedding model name. (default: trained_word2vec.model)")
+tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model.word", "Word embedding model name. (default: trained_word2vec.model)")
+tf.flags.DEFINE_boolean("word_segment", True, "Whether do word segmentation. (default: False)")
 
 # Misc Parameters
 tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
@@ -72,7 +73,8 @@ else:
 
 # Get Embedding vector x_test
 print max_document_length
-x_test, max_document_length = data_helpers.padding_sentences(x_raw, '<PADDING>', padding_sentence_length = max_document_length)
+x_test, max_document_length = data_helpers.padding_sentences(x_raw, '<PADDING>', word_segment=FLAGS.word_segment,
+                                                             padding_sentence_length = max_document_length)
 _, w2vModel = word2vec_helpers.embedding_sentences(file_to_load = trained_word2vec_model_file)
 x_test = np.array(x_test)
 

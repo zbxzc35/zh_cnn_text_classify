@@ -21,12 +21,12 @@ tf.flags.DEFINE_string("data_dir", "./data/processed/training/", "Data source fo
 tf.flags.DEFINE_integer("num_labels", None, "Number of labels for data. (default: None)")
 tf.flags.DEFINE_integer("max_document_len", 100, "Max document lenth. (default: None)")
 
-tf.flags.DEFINE_boolean("word_segment", False, "Whether do word segmentation. (default: False)")
+tf.flags.DEFINE_boolean("word_segment", True, "Whether do word segmentation. (default: False)")
 
-tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model", "Word embedding model name. (default: trained_word2vec.model)")
+tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model.word", "Word embedding model name. (default: trained_word2vec.model)")
 
 # Model hyperparameters
-tf.flags.DEFINE_integer("embedding_dim", 512, "Dimensionality of character embedding (default: 300)")
+tf.flags.DEFINE_integer("embedding_dim", 300, "Dimensionality of character embedding (default: 300)")
 tf.flags.DEFINE_string("filter_sizes", "2,3,4,5", "Comma-spearated filter sizes (default: '2,3,4,5')")
 tf.flags.DEFINE_integer("num_filters", 256, "Number of filters per filter size (default: 128)")
 tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (default: 0.5)")
@@ -67,13 +67,13 @@ if not os.path.exists(out_dir):
 
 # Load data
 print("Loading data...")
-x_text, y = data_helpers.load_positive_negative_data_files(FLAGS)
+x, y = data_helpers.load_positive_negative_data_files(FLAGS)
 
 # Get embedding vector
-sentences, max_document_length = data_helpers.padding_sentences(x_text, '<PADDING>',word_segment= FLAGS.word_segment,
+x, max_document_length = data_helpers.padding_sentences(x, '<PADDING>',word_segment= FLAGS.word_segment,
                                                                 padding_sentence_length=FLAGS.max_document_len)
 if not os.path.exists(_w2v_path):
-    _, w2vModel = word2vec_helpers.embedding_sentences(sentences = sentences,
+    _, w2vModel = word2vec_helpers.embedding_sentences(sentences = x,
                                                        embedding_size = FLAGS.embedding_dim, file_to_save = _w2v_path)
 else:
     _, w2vModel = word2vec_helpers.embedding_sentences(sentences = None ,
@@ -82,7 +82,7 @@ FLAGS.embedding_dim = w2vModel.vector_size
 print ('wordembedding.dim = {}'.format(FLAGS.embedding_dim))
 print ('wordembedding.lenth = {}'.format(len(w2vModel.wv.vocab)))
 
-x = np.array(sentences)
+x = np.array(x)
 print("x.shape = {}".format(x.shape))
 print("y.shape = {}".format(y.shape))
 
@@ -93,14 +93,14 @@ data_helpers.saveDict(params, training_params_file)
 
 # Shuffle data randomly
 shuffle_indices = np.random.permutation(np.arange(len(y)))
-x_shuffled = x[shuffle_indices]
-y_shuffled = y[shuffle_indices]
+x = x[shuffle_indices]
+y = y[shuffle_indices]
 
 # Split train/test set
 # TODO: This is very crude, should use cross-validation
 dev_sample_index = -1 * int(FLAGS.dev_sample_percentage * float(len(y)))
-x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
-y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
+x_train, x_dev = x[:dev_sample_index], x[dev_sample_index:]
+y_train, y_dev = y[:dev_sample_index], y[dev_sample_index:]
 print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
 
 # Training
