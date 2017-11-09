@@ -1,6 +1,8 @@
 import tensorflow as tf
 import numpy as np
 
+from flip_gradient import flip_gradient
+
 
 class TextCNN(object):
     '''
@@ -9,12 +11,15 @@ class TextCNN(object):
     '''
 
     def __init__(
-            self, sequence_length, num_classes,
+            self, sequence_length, num_classes,num_labels,
             embedding_size, filter_sizes, num_filters, l2_reg_lambda=0.0):
         # Placeholders for input, output, dropout
         self.input_x = tf.placeholder(tf.float32, [None, sequence_length, embedding_size], name="input_x")
         self.input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")
+        self.d_label = tf.placeholder(tf.float32, [None, num_labels], name="input_y")
         self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
+        self.reverse_grad_lambda = tf.placeholder(tf.float32, name="dropout_keep_prob")
+
 
         # Keeping track of l2 regularization loss (optional)
         l2_loss = tf.constant(0.0)
@@ -71,10 +76,24 @@ class TextCNN(object):
             self.scores = tf.nn.xw_plus_b(self.h_drop, W, b, name="scores")
             self.predictions = tf.argmax(self.scores, 1, name="predictions")
 
+        # Final (unnomalized) scores and predictions
+        with tf.name_scope("Domain_output"):
+            Wd = tf.get_variable(
+                "Wd",
+                shape=[num_filters_total, num_labels],
+                initializer=tf.contrib.layers.xavier_initializer())
+            bd = tf.Variable(tf.constant(0.1, shape=[num_labels], name="bd"))
+            f = flip_gradient(self.h_pool_flat,self.reverse_grad_lambda)
+            self.domain_scores = tf.nn.xw_plus_b(f, Wd, bd, name="scores")
+            self.domain_predictions = tf.argmax(self.domain_scores, 1, name="predictions")
+
         # Calculate Mean cross-entropy loss
         with tf.name_scope("loss"):
             losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
             self.loss = tf.reduce_mean(losses) + l2_reg_lambda * l2_loss
+
+            losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.domain_scores, labels=self.d_label)
+            self.d_loss = tf.reduce_mean(losses) + l2_reg_lambda * l2_loss
 
         # Accuracy
         with tf.name_scope("accuracy"):

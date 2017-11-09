@@ -46,17 +46,79 @@ def load_positive_negative_data_files(FLAGS):
     # General_Mentioned_examples     = read_and_clean_zh_file(FLAGS.General_Mentioned_file)
     # Stocks_Earnings_examples       = read_and_clean_zh_file(FLAGS.Stocks_Earnings_file)
     mypath = FLAGS.data_dir
-    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-    FLAGS.num_labels = len(onlyfiles)
+    onlyfolder = [f for f in listdir(mypath)]
+    y = []
+    d_lable = []
+    x_text = []
+    d_I = np.eye(len(onlyfolder), dtype=int)
 
+    for (d,folder) in enumerate(onlyfolder):
+
+        onlyfiles = [f for f in listdir(join(mypath, folder)) if isfile(join(mypath,folder, f))]
+        FLAGS.num_labels = len(onlyfiles)
+
+        # Combine data
+        examples = []
+        for i in range(len(onlyfiles)):
+            examples.append(read_and_clean_zh_file(mypath + folder+ "/" + onlyfiles[i]))
+
+            x_text += examples[i][:]
+
+
+
+
+        # Generate labels
+        I = np.eye(len(onlyfiles), dtype=int)
+        for i in range(len(onlyfiles)):
+            y += [I[i] for _ in examples[i]]
+            d_lable += [d_I[d] for _ in examples[i]]
+
+
+
+
+    # y = np.concatenate([Ads_Marketing_labels, Agent_Issues_labels, Charity_Events_labels,
+    #                     Contact_Information_labels, Corporate_Brand_labels, Corporate_News_labels,
+    #                     Customer_Service_labels, Employment_labels, Fund_labels, Health_Information_labels,
+    #                     Irrelevant_Ads_labels, Life_Comprehend_labels, Products_labels, Products_Service_labels,
+    #                     Recruitment_labels, Sponsored_Events_labels, Survey_Questions_labels,
+    #                     Volunteering_Activity_labels, Website_Issues_labels, General_Mentioned_labels, Stocks_Earnings_labels], 0)
+    return [x_text, np.array(y), np.array(d_lable)]
+def load_dev_data_files(mypath):
+    """
+    Loads MR polarity data from files, splits the data into words and generates labels.
+    Returns split sentences and labels.
+    """
+    # Load data from files
+    # Ads_Marketing_examples         = read_and_clean_zh_file(FLAGS.Ads_Marketing_file)
+    # Agent_Issues_examples          = read_and_clean_zh_file(FLAGS.Agent_Issues_file)
+    # Charity_Events_examples        = read_and_clean_zh_file(FLAGS.Charity_Events_file)
+    # Contact_Information_examples   = read_and_clean_zh_file(FLAGS.Contact_Information_file)
+    # Corporate_Brands_examples      = read_and_clean_zh_file(FLAGS.Corporate_Brands_file)
+    # Corporate_News_examples        = read_and_clean_zh_file(FLAGS.Corporate_News_file)
+    # Customer_Service_examples      = read_and_clean_zh_file(FLAGS.Customer_Service_file)
+    # Employment_examples            = read_and_clean_zh_file(FLAGS.Employment_file)
+    # Fund_examples                  = read_and_clean_zh_file(FLAGS.Fund_file)
+    # Health_Information_examples    = read_and_clean_zh_file(FLAGS.Health_Information_file)
+    # Irrelevant_Ads_examples        = read_and_clean_zh_file(FLAGS.Irrelevant_Ads_file)
+    # Life_Comprehend_examples       = read_and_clean_zh_file(FLAGS.Life_Comprehend_file)
+    # Products_examples              = read_and_clean_zh_file(FLAGS.Products_file)
+    # Products_Service_examples      = read_and_clean_zh_file(FLAGS.Products_Service_file)
+    # Recruitment_examples           = read_and_clean_zh_file(FLAGS.Recruitment_file)
+    # Sponsored_Events_examples      = read_and_clean_zh_file(FLAGS.Sponsored_Events_file)
+    # Survey_Questions_examples      = read_and_clean_zh_file(FLAGS.Survey_Questions_file)
+    # Volunteering_Activity_examples = read_and_clean_zh_file(FLAGS.Volunteering_Activity_file)
+    # Website_Issues_examples        = read_and_clean_zh_file(FLAGS.Website_Issues_file)
+    #
+    # General_Mentioned_examples     = read_and_clean_zh_file(FLAGS.General_Mentioned_file)
+    # Stocks_Earnings_examples       = read_and_clean_zh_file(FLAGS.Stocks_Earnings_file)
+    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
     # Combine data
     examples = []
+    x_text = []
     for i in range(len(onlyfiles)):
         examples.append(read_and_clean_zh_file(mypath + onlyfiles[i]))
-        if i == 0:
-            x_text = examples[i][:]
-        else:
-            x_text += examples[i][:]
+        x_text += examples[i][:]
+
 
 
 
