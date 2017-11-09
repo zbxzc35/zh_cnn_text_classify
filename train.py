@@ -139,7 +139,7 @@ with tf.Graph().as_default():
 
         # Define Training procedure
         global_step = tf.Variable(0, name="global_step", trainable=False)
-        optimizer = tf.train.AdamOptimizer(1e-3)
+        optimizer = tf.train.AdamOptimizer(cnn.learning_rate)
         grads_and_vars = optimizer.compute_gradients(cnn.loss)
         train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
         grads_domain = optimizer.compute_gradients(cnn.d_loss)
@@ -192,6 +192,7 @@ with tf.Graph().as_default():
                 cnn.d_label: d_batch,
                 cnn.dropout_keep_prob: FLAGS.dropout_keep_prob,
                 cnn.reverse_grad_lambda: 2. / (1. + np.exp(-10. * p)) - 1,
+                cnn.learning_rate : 0.002 / (1. + 10 * p)**0.75
             }
 
             _,_, step, summaries, loss, accuracy, d_loss = sess.run(
@@ -210,6 +211,7 @@ with tf.Graph().as_default():
                 cnn.input_x: x_batch,
                 cnn.input_y: y_batch,
                 cnn.dropout_keep_prob: FLAGS.dropout_keep_prob,
+                cnn.learning_rate: 0.002 / (1. + 10 * p)**0.75
             }
             _, step, summaries, loss, accuracy, predictions = sess.run(
                 [train_op,global_step, dev_summary_op, cnn.loss, cnn.accuracy, cnn.predictions],

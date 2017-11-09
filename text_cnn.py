@@ -19,6 +19,7 @@ class TextCNN(object):
         self.d_label = tf.placeholder(tf.float32, [None, num_labels], name="input_y")
         self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
         self.reverse_grad_lambda = tf.placeholder(tf.float32, name="reverse_grad_lambda")
+        self.learning_rate = tf.placeholder(tf.float32, name="learning_rate")
 
 
         # Keeping track of l2 regularization loss (optional)
@@ -93,7 +94,7 @@ class TextCNN(object):
             self.loss = tf.reduce_mean(losses) + l2_reg_lambda * l2_loss
 
             losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.domain_scores, labels=self.d_label)
-            self.d_loss = tf.reduce_mean(losses) + l2_reg_lambda * l2_loss
+            self.d_loss = tf.reduce_mean(losses)
 
         # Accuracy
         with tf.name_scope("accuracy"):
