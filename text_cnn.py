@@ -18,7 +18,7 @@ class TextCNN(object):
         self.input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")
         self.d_label = tf.placeholder(tf.float32, [None, num_labels], name="input_y")
         self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
-        self.reverse_grad_lambda = tf.placeholder(tf.float32, name="dropout_keep_prob")
+        self.reverse_grad_lambda = tf.placeholder(tf.float32, name="reverse_grad_lambda")
 
 
         # Keeping track of l2 regularization loss (optional)

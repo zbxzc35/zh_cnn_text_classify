@@ -191,7 +191,7 @@ with tf.Graph().as_default():
                 cnn.input_y: y_batch,
                 cnn.d_label: d_batch,
                 cnn.dropout_keep_prob: FLAGS.dropout_keep_prob,
-                cnn.reverse_grad_lambda: 2. / (1. + np.exp(-10. * p)) - 1
+                cnn.reverse_grad_lambda: 2. / (1. + np.exp(-10. * p)) - 1,
             }
 
             _,_, step, summaries, loss, accuracy, d_loss = sess.run(
@@ -201,7 +201,7 @@ with tf.Graph().as_default():
             print("{}: label step {}, loss {:g}, acc {:g}, d_loss {:g}".format(time_str, step, loss, accuracy, d_loss))
             train_summary_writer.add_summary(summaries, step)
 
-        def target_step(x_batch, y_batch, writer=None):
+        def target_step(x_batch, y_batch,p = 1e-3):
             """
             Evaluates model on a dev set
             """
@@ -209,15 +209,14 @@ with tf.Graph().as_default():
             feed_dict = {
                 cnn.input_x: x_batch,
                 cnn.input_y: y_batch,
-                cnn.dropout_keep_prob: 1.0
+                cnn.dropout_keep_prob: FLAGS.dropout_keep_prob,
             }
             _, step, summaries, loss, accuracy, predictions = sess.run(
                 [train_op,global_step, dev_summary_op, cnn.loss, cnn.accuracy, cnn.predictions],
                 feed_dict)
             time_str = datetime.datetime.now().isoformat()
             print("{}: train step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
-            if writer:
-                writer.add_summary(summaries, step)
+
 
         def dev_step(x_batch, y_batch, writer=None):
             """
@@ -245,13 +244,14 @@ with tf.Graph().as_default():
 
 
         # Training loop. For each batch...
-        for (step,batch) in enumerate(batches):
+        for (s,batch) in enumerate(batches):
 
             x_batch, y_batch, d_batch = zip(*batch)
             x_batch_embedding, _ = word2vec_helpers.embedding_sentences(sentences= x_batch, embedding_size = FLAGS.embedding_dim,
                                                                         file_to_load = _w2v_path, model=w2vModel)
             x_batch = np.array(x_batch_embedding)
-            train_step(x_batch, y_batch, d_batch, float(step) / (float(len(x_train)*FLAGS.num_epochs)/FLAGS.batch_size))
+            p = float(s) / (float(len(x_train)*FLAGS.num_epochs)/FLAGS.batch_size)
+            train_step(x_batch, y_batch, d_batch, p)
 
             shuffle_indices = np.random.permutation(np.arange(len(x_t)))[:FLAGS.batch_size/4]
 
@@ -261,7 +261,7 @@ with tf.Graph().as_default():
             x_batch_embedding, _ = word2vec_helpers.embedding_sentences(sentences= x_t_batch, embedding_size = FLAGS.embedding_dim,
                                                                         file_to_load = _w2v_path, model=w2vModel)
             x_t_batch = np.array(x_batch_embedding)
-            target_step(x_t_batch, y_t_batch)
+            target_step(x_t_batch, y_t_batch,p)
 
             current_step = tf.train.global_step(sess, global_step)
             if current_step % FLAGS.evaluate_every == 0:
