@@ -19,11 +19,11 @@ tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training d
 tf.flags.DEFINE_string("data_dir", "./data/processed/training/", "Data source for classification.")
 
 tf.flags.DEFINE_integer("num_labels", None, "Number of labels for data. (default: None)")
-tf.flags.DEFINE_integer("max_document_len", 100, "Max document lenth. (default: None)")
+tf.flags.DEFINE_integer("max_document_len", 300, "Max document lenth. (default: None)")
 
 tf.flags.DEFINE_boolean("word_segment", False, "Whether do word segmentation. (default: False)")
 
-tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model", "Word embedding model name. (default: trained_word2vec.model)")
+tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model.dianping", "Word embedding model name. (default: trained_word2vec.model)")
 
 # Model hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 512, "Dimensionality of character embedding (default: 300)")
