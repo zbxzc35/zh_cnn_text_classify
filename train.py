@@ -24,7 +24,7 @@ tf.flags.DEFINE_integer("max_document_len", 300, "Max document lenth. (default: 
 
 tf.flags.DEFINE_boolean("word_segment", False, "Whether do word segmentation. (default: False)")
 
-tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model.dianping", "Word embedding model name. (default: trained_word2vec.model)")
+tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model.dianpingsnownlpmanulife", "Word embedding model name. (default: trained_word2vec.model)")
 
 # Model hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 512, "Dimensionality of character embedding (default: 300)")
@@ -72,6 +72,8 @@ print("Loading data...")
 x, y, d = data_helpers.load_positive_negative_data_files(FLAGS)
 x_target, y_target = data_helpers.load_dev_data_files(FLAGS.dev_dir)
 
+
+
 # Get embedding vector
 x, max_document_length = data_helpers.padding_sentences(x, '<PADDING>',word_segment= FLAGS.word_segment,
                                                                 padding_sentence_length=FLAGS.max_document_len)
@@ -81,11 +83,13 @@ x_target, _ = data_helpers.padding_sentences(x_target, '<PADDING>',word_segment=
                                                                 padding_sentence_length=FLAGS.max_document_len)
 
 if not os.path.exists(_w2v_path):
-    _, w2vModel = word2vec_helpers.embedding_sentences(sentences = x,
+    _, w2vModel = word2vec_helpers.embedding_sentences(sentences = x + x_target,
                                                        embedding_size = FLAGS.embedding_dim, file_to_save = _w2v_path)
 else:
     _, w2vModel = word2vec_helpers.embedding_sentences(sentences = None ,
                                                        embedding_size = FLAGS.embedding_dim, file_to_load = _w2v_path)
+
+
 FLAGS.embedding_dim = w2vModel.vector_size
 print ('wordembedding.dim = {}'.format(FLAGS.embedding_dim))
 print ('wordembedding.lenth = {}'.format(len(w2vModel.wv.vocab)))
@@ -112,12 +116,12 @@ shuffle_indices = np.random.permutation(np.arange(len(y_target)))
 x_target = x_target[shuffle_indices]
 y_target = y_target[shuffle_indices]
 
-dev_sample_index = -1 * int(FLAGS.dev_sample_percentage * float(len(y)))
+dev_sample_index = -1 * int(FLAGS.dev_sample_percentage * float(len(y_target)))
 x_t, x_dev = x_target[:dev_sample_index], x_target[dev_sample_index:]
 y_t, y_dev = y_target[:dev_sample_index], y_target[dev_sample_index:]
 
 
-print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
+print("Train/Target/Dev split: {:d}/{:d}/{:d}".format(len(y_train), len(y_t), len(y_dev)))
 
 # Training
 # =======================================================
