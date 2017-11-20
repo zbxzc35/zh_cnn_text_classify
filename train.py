@@ -20,11 +20,11 @@ tf.flags.DEFINE_string("data_dir", "./data/processed/training/", "Data source fo
 tf.flags.DEFINE_string("dev_dir", "./data/processed/validation/", "Data source for classification.")
 
 tf.flags.DEFINE_integer("num_labels", None, "Number of labels for data. (default: None)")
-tf.flags.DEFINE_integer("max_document_len", 300, "Max document lenth. (default: None)")
+tf.flags.DEFINE_integer("max_document_len", 500, "Max document lenth. (default: None)")
 
 tf.flags.DEFINE_boolean("word_segment", False, "Whether do word segmentation. (default: False)")
 
-tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model.dianpingsnownlpmanulife", "Word embedding model name. (default: trained_word2vec.model)")
+tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model.all", "Word embedding model name. (default: trained_word2vec.model)")
 
 # Model hyperparameters
 tf.flags.DEFINE_integer("embedding_dim", 512, "Dimensionality of character embedding (default: 300)")
@@ -228,8 +228,8 @@ with tf.Graph().as_default():
             """
             Evaluates model on a dev set
             """
-            print x_batch.shape
-            print y_batch.shape
+            print(x_batch.shape)
+            print(y_batch.shape)
             feed_dict = {
                 cnn.input_x: x_batch,
                 cnn.input_y: y_batch,
@@ -240,8 +240,8 @@ with tf.Graph().as_default():
                 feed_dict)
             time_str = datetime.datetime.now().isoformat()
             print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
-            print [x.argmax() for x in y_batch]
-            print [x for x in predictions]
+            print([x.argmax() for x in y_batch])
+            print([x for x in predictions])
             if writer:
                 writer.add_summary(summaries, step)
 
@@ -259,7 +259,7 @@ with tf.Graph().as_default():
             p = float(s) / (float(len(x_train)*FLAGS.num_epochs)/FLAGS.batch_size)
             train_step(x_batch, y_batch, d_batch, p)
 
-            shuffle_indices = np.random.permutation(np.arange(len(x_t)))[:FLAGS.batch_size/4]
+            shuffle_indices = np.random.permutation(np.arange(len(x_t)))[:int(FLAGS.batch_size/4)]
 
             x_t_batch = x_t[shuffle_indices]
             y_t_batch = y_t[shuffle_indices]
