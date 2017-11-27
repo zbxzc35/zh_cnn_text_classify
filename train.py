@@ -193,8 +193,8 @@ with tf.Graph().as_default():
                 feed_dict)
             time_str = datetime.datetime.now().isoformat()
             print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
-            print [x.argmax() for x in y_batch]
-            print [x for x in predictions]
+            print([x.argmax() for x in y_batch])
+            print([x for x in predictions])
             if writer:
                 writer.add_summary(summaries, step)
 
