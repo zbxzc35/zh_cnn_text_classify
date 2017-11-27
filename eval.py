@@ -21,7 +21,7 @@ tf.flags.DEFINE_string("data_dir", "./data/processed/testing/", "Test text data 
 
 # Eval Parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_string("checkpoint_dir", "./runs/28VE64~F/checkpoints/", "Checkpoint directory from training run")
+tf.flags.DEFINE_string("checkpoint_dir", "./runs/2017-11-27T11:30:33.720562/checkpoints/", "Checkpoint directory from training run")
 tf.flags.DEFINE_boolean("eval_train", True, "Evaluate on all training data")
 tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model.dianping", "Word embedding model name. (default: trained_word2vec.model)")
 tf.flags.DEFINE_boolean("word_segment", False, "Whether do word segmentation. (default: False)")
@@ -130,7 +130,7 @@ if y_test is not None:
     print("Accuracy: {:g}".format(correct_predictions/float(len(y_test))))
 
 # Save the evaluation to a csv
-predictions_human_readable = np.asarray([np.array([text.encode('utf-8') for text in x_raw]), y_vect, all_predictions])
+predictions_human_readable = np.asarray([np.array([text for text in x_raw]), y_vect, all_predictions])
 print(predictions_human_readable.shape)
 out_path = os.path.join(FLAGS.checkpoint_dir, "..", "prediction.csv")
 print("Saving evaluation to {0}".format(out_path))
