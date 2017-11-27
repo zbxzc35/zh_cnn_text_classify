@@ -21,7 +21,7 @@ tf.flags.DEFINE_string("data_dir", "./data/processed/testing/", "Test text data 
 
 # Eval Parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_string("checkpoint_dir", "./runs/2017-11-14T10:12:00.719535/checkpoints/", "Checkpoint directory from training run")
+tf.flags.DEFINE_string("checkpoint_dir", "./runs/2017-11-20T18:08:31.906146/checkpoints/", "Checkpoint directory from training run")
 tf.flags.DEFINE_boolean("eval_train", True, "Evaluate on all training data")
 tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model.all", "Word embedding model name. (default: trained_word2vec.model)")
 tf.flags.DEFINE_boolean("word_segment", False, "Whether do word segmentation. (default: False)")
@@ -72,7 +72,7 @@ else:
     y_test = [1, 0]
 
 # Get Embedding vector x_test
-print max_document_length
+print(max_document_length)
 x_test, max_document_length = data_helpers.padding_sentences(x_raw, '<PADDING>', word_segment=FLAGS.word_segment,
                                                              padding_sentence_length = max_document_length)
 _, w2vModel = word2vec_helpers.embedding_sentences(file_to_load = trained_word2vec_model_file)
@@ -121,7 +121,7 @@ with graph.as_default():
 if y_test is not None:
     onlyfiles = [f for f in listdir(FLAGS.data_dir) if isfile(join(FLAGS.data_dir, f))]
     lable_dict = {i: word.split('.')[0] for i, word in enumerate(onlyfiles)}
-    print lable_dict
+    print(lable_dict)
     y_vect = np.array([lable_dict[x.argmax()] for x in y_test])
     all_predictions = np.array([lable_dict[int(x)] for x in all_predictions])
     correct_predictions = float(np.sum(all_predictions == y_vect))
@@ -130,8 +130,8 @@ if y_test is not None:
     print("Accuracy: {:g}".format(correct_predictions/float(len(y_test))))
 
 # Save the evaluation to a csv
-predictions_human_readable = np.asarray([np.array([text.encode('utf-8') for text in x_raw]), y_vect, all_predictions])
-print predictions_human_readable.shape
+predictions_human_readable = np.asarray([np.array([text for text in x_raw]), y_vect, all_predictions])
+print(predictions_human_readable.shape)
 out_path = os.path.join(FLAGS.checkpoint_dir, "..", "prediction.csv")
 print("Saving evaluation to {0}".format(out_path))
 with open(out_path, 'w') as f:
