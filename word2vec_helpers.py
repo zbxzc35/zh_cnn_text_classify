@@ -22,6 +22,7 @@ def output_vocab(vocab):
 
 def embedding_sentences(sentences = None, embedding_size = 300, window = 5, min_count = 5, file_to_load = None, file_to_save = None, model = None):
     all_vectors = []
+    print("length of embedding sentences : %d" % len(sentences))
     if model is not None:
         w2vModel = model
     else:

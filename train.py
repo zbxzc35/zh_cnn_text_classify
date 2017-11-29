@@ -18,6 +18,7 @@ tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training d
 
 tf.flags.DEFINE_string("data_dir", "./data/processed/training/", "Data source for classification.")
 tf.flags.DEFINE_string("dev_dir", "./data/processed/validation/", "Data source for classification.")
+tf.flags.DEFINE_string("test_dir", "./data/processed/testing/", "Data source for classification.")
 
 tf.flags.DEFINE_integer("num_labels", None, "Number of labels for data. (default: None)")
 tf.flags.DEFINE_integer("max_document_len", 500, "Max document lenth. (default: None)")
@@ -82,8 +83,10 @@ x, max_document_length = data_helpers.padding_sentences(x, '<PADDING>',word_segm
 x_target, _ = data_helpers.padding_sentences(x_target, '<PADDING>',word_segment= FLAGS.word_segment,
                                                                 padding_sentence_length=FLAGS.max_document_len)
 
+x_test, _ = data_helpers.load_dev_data_files(FLAGS.test_dir)
+
 if not os.path.exists(_w2v_path):
-    _, w2vModel = word2vec_helpers.embedding_sentences(sentences = x + x_target,
+    _, w2vModel = word2vec_helpers.embedding_sentences(sentences = x + x_target + x_test,
                                                        embedding_size = FLAGS.embedding_dim, file_to_save = _w2v_path)
 else:
     _, w2vModel = word2vec_helpers.embedding_sentences(sentences = None ,
