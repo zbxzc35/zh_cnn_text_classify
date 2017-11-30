@@ -45,7 +45,7 @@ tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (d
 # Misc parameters
 tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
 tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
-tf.flags.DEFINE_string("training_device", '/gpu:3', "Witch device use to train")
+#tf.flags.DEFINE_string("training_device", '/gpu:3', "Witch device use to train")
 
 # Parse parameters from commands
 
@@ -135,7 +135,7 @@ with tf.Graph().as_default():
         log_device_placement = FLAGS.log_device_placement)
     sess = tf.Session(config = session_conf)
     with sess.as_default():
-        with tf.device(FLAGS.training_device):
+        #with tf.device(FLAGS.training_device):
             cnn = TextCNN(
                 sequence_length = x_train.shape[1],
                 num_classes = y_train.shape[1],
