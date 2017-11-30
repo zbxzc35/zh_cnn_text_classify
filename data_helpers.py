@@ -119,17 +119,11 @@ def load_dev_data_files(mypath):
         examples.append(read_and_clean_zh_file(mypath + onlyfiles[i]))
         x_text += examples[i][:]
 
-
-
-
-
+    y = []
     # Generate labels
     I = np.eye(len(onlyfiles), dtype=int)
     for i in range(len(onlyfiles)):
-        if i == 0:
-            y = [I[i] for _ in examples[i]]
-        else:
-            y += [I[i] for _ in examples[i]]
+        y += [I[i] for _ in examples[i]]
 
 
     # y = np.concatenate([Ads_Marketing_labels, Agent_Issues_labels, Charity_Events_labels,

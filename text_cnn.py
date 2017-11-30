@@ -93,6 +93,8 @@ class TextCNN(object):
             losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
             self.loss = tf.reduce_mean(losses) + l2_reg_lambda * l2_loss
 
+        with tf.name_scope("d_loss"):
+
             losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.domain_scores, labels=self.d_label)
             self.d_loss = tf.reduce_mean(losses)
 
