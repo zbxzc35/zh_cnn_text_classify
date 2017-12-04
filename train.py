@@ -18,7 +18,7 @@ tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training d
 
 tf.flags.DEFINE_string("data_dir", "./data/processed/training/", "Data source for classification.")
 tf.flags.DEFINE_string("dev_dir", "./data/processed/validation/", "Data source for classification.")
-tf.flags.DEFINE_string("test_dir", "./data/processed/testing/", "Data source for classification.")
+tf.flags.DEFINE_string("test_dir", "./data/processed/sa_test/", "Data source for classification.")
 
 tf.flags.DEFINE_integer("num_labels", None, "Number of labels for data. (default: None)")
 tf.flags.DEFINE_integer("max_document_len", 500, "Max document lenth. (default: None)")
