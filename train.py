@@ -17,8 +17,10 @@ from text_cnn import TextCNN
 tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training data to use for validation")
 
 tf.flags.DEFINE_string("data_dir", "./data/processed/training/", "Data source for classification.")
-tf.flags.DEFINE_string("dev_dir", "./data/processed/validation/", "Data source for classification.")
-tf.flags.DEFINE_string("test_dir", "./data/processed/sa_test/", "Data source for classification.")
+tf.flags.DEFINE_string("dev_dir", "./data/processed/validation/", "Data source for validation.")
+tf.flags.DEFINE_string("test_dir", "./data/processed/testing/", "Data source for testing.")
+tf.flags.DEFINE_string("sub_folder", "folder1", "Sub folder use to cross validation. (default: None)")
+tf.flags.DEFINE_string("result_folder", "DACNN_cross_validation", "Folder use to save the result. (default: None)")
 
 tf.flags.DEFINE_integer("num_labels", None, "Number of labels for data. (default: None)")
 tf.flags.DEFINE_integer("max_document_len", 500, "Max document lenth. (default: None)")
@@ -60,7 +62,10 @@ print("")
 # =======================================================
 
 timestamp = datetime.datetime.now().isoformat()
-out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", timestamp))
+if FLAGS.result_folder is not None:
+    out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", FLAGS.result_folder,FLAGS.sub_folder))
+else:
+    out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", timestamp))
 _w2v_path = os.path.join(os.path.curdir, "runs", FLAGS.wordembedding_name)
 print("Writing to {}\n".format(out_dir))
 if not os.path.exists(out_dir):
@@ -72,7 +77,12 @@ if not os.path.exists(out_dir):
 # Load data
 print("Loading data...")
 x, y, d = data_helpers.load_positive_negative_data_files(FLAGS)
-x_target, y_target = data_helpers.load_dev_data_files(FLAGS.dev_dir)
+
+if FLAGS.result_folder is not None:
+    dev_dir = os.path.abspath(os.path.join(FLAGS.dev_dir, FLAGS.sub_folder)) + "/"
+    x_target, y_target = data_helpers.load_dev_data_files(dev_dir)
+else:
+    x_target, y_target = data_helpers.load_dev_data_files(FLAGS.dev_dir)
 
 
 
@@ -85,7 +95,12 @@ x_target, _ = data_helpers.padding_sentences(x_target, '<PADDING>',word_segment=
                                                                 padding_sentence_length=FLAGS.max_document_len)
 
 if not os.path.exists(_w2v_path):
-    x_test, _ = data_helpers.load_dev_data_files(FLAGS.test_dir)
+
+    if FLAGS.result_folder is not None:
+        test_dir = os.path.abspath(os.path.join(FLAGS.test_dir, FLAGS.sub_folder)) + "/"
+        x_test, _ = data_helpers.load_dev_data_files(test_dir)
+    else:
+        x_test, _ = data_helpers.load_dev_data_files(FLAGS.test_dir)
     _, w2vModel = word2vec_helpers.embedding_sentences(sentences = x + x_target + x_test,
                                                        embedding_size = FLAGS.embedding_dim, file_to_save = _w2v_path)
 else:
