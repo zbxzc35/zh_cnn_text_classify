@@ -17,11 +17,13 @@ import csv
 #2 catigories 98.3: 2017-10-14T07:06:27.827187
 #2 catigories 98.4: 2017-10-14T13:26:17.814401
 # Data Parameters
-tf.flags.DEFINE_string("data_dir", "./data/processed/sa_test/", "Test text data source to evaluate.")
+tf.flags.DEFINE_string("data_dir", "./data/processed/testing/", "Test text data source to evaluate.")
+tf.flags.DEFINE_string("sub_folder", "folder1", "Sub folder use to cross validation. (default: None)")
 
 # Eval Parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_string("checkpoint_dir", "./runs/2017-12-05T09:08:55.767478/checkpoints/", "Checkpoint directory from training run")
+tf.flags.DEFINE_string("checkpoint_dir", "./runs/DACNN_cross_validation/", "Checkpoint directory from training run")
+
 tf.flags.DEFINE_boolean("eval_train", True, "Evaluate on all training data")
 tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model.all", "Word embedding model name. (default: trained_word2vec.model)")
 tf.flags.DEFINE_boolean("word_segment", False, "Whether do word segmentation. (default: False)")
@@ -41,7 +43,7 @@ print("")
 # ==================================================
 
 # validate checkout point file
-checkpoint_file = tf.train.latest_checkpoint(FLAGS.checkpoint_dir)
+checkpoint_file = tf.train.latest_checkpoint(FLAGS.checkpoint_dir + FLAGS.sub_folder + '/checkpoints')
 if checkpoint_file is None:
     print("Cannot find a valid checkpoint file!")
     exit(0)
@@ -54,7 +56,7 @@ if not os.path.exists(trained_word2vec_model_file):
 print("Using word2vec model file : {}".format(trained_word2vec_model_file))
 
 # validate training params file
-training_params_file = os.path.join(FLAGS.checkpoint_dir, "..", "training_params.pickle")
+training_params_file = os.path.join(FLAGS.checkpoint_dir + FLAGS.sub_folder + '/', "training_params.pickle")
 if not os.path.exists(training_params_file):
     print("Training params file \'{}\' is missing!".format(training_params_file))
 print("Using training params file : {}".format(training_params_file))
@@ -65,8 +67,9 @@ num_labels = 3
 max_document_length = int(params['max_document_length'])
 
 # Load data
+data_dir = FLAGS.data_dir + FLAGS.sub_folder + '/'
 if FLAGS.eval_train:
-    x_raw, y_test = data_helpers.load_dev_data_files(FLAGS.data_dir)
+    x_raw, y_test = data_helpers.load_dev_data_files(data_dir)
 else:
     x_raw = ["a masterpiece four years in the making", "everything is off."]
     y_test = [1, 0]
@@ -84,7 +87,7 @@ print("x_test.shape = {}".format(x_test.shape))
 # Evaluation
 # ==================================================
 print("\nEvaluating...\n")
-checkpoint_file = tf.train.latest_checkpoint(FLAGS.checkpoint_dir)
+checkpoint_file = tf.train.latest_checkpoint(FLAGS.checkpoint_dir + FLAGS.sub_folder + '/checkpoints')
 graph = tf.Graph()
 with graph.as_default():
     session_conf = tf.ConfigProto(
@@ -92,34 +95,34 @@ with graph.as_default():
       log_device_placement=FLAGS.log_device_placement)
     sess = tf.Session(config=session_conf)
     with sess.as_default():
-    #   with tf.device('/cpu:0'):
-        # Load the saved meta graph and restore variables
-        saver = tf.train.import_meta_graph("{}.meta".format(checkpoint_file))
-        saver.restore(sess, checkpoint_file)
+        with tf.device('/cpu:0'):
+            # Load the saved meta graph and restore variables
+            saver = tf.train.import_meta_graph("{}.meta".format(checkpoint_file))
+            saver.restore(sess, checkpoint_file)
 
-        # Get the placeholders from the graph by name
-        input_x = graph.get_operation_by_name("input_x").outputs[0]
-        # input_y = graph.get_operation_by_name("input_y").outputs[0]
-        dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
+            # Get the placeholders from the graph by name
+            input_x = graph.get_operation_by_name("input_x").outputs[0]
+            # input_y = graph.get_operation_by_name("input_y").outputs[0]
+            dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
 
-        # Tensors we want to evaluate
-        predictions = graph.get_operation_by_name("output/predictions").outputs[0]
+            # Tensors we want to evaluate
+            predictions = graph.get_operation_by_name("output/predictions").outputs[0]
 
-        # Generate batches for one epoch
-        batches = data_helpers.batch_iter(list(x_test), FLAGS.batch_size, 1, shuffle=False)
+            # Generate batches for one epoch
+            batches = data_helpers.batch_iter(list(x_test), FLAGS.batch_size, 1, shuffle=False)
 
-        # Collect the predictions here
-        all_predictions = []
+            # Collect the predictions here
+            all_predictions = []
 
-        for x_test_batch in batches:
-            x_batch_embedding, _ = word2vec_helpers.embedding_sentences(sentences=x_test_batch, model=w2vModel)
-            x_test_batch = np.array(x_batch_embedding)
-            batch_predictions = sess.run(predictions, {input_x: x_test_batch, dropout_keep_prob: 1.0})
-            all_predictions = np.concatenate([all_predictions, batch_predictions])
+            for x_test_batch in batches:
+                x_batch_embedding, _ = word2vec_helpers.embedding_sentences(sentences=x_test_batch, model=w2vModel)
+                x_test_batch = np.array(x_batch_embedding)
+                batch_predictions = sess.run(predictions, {input_x: x_test_batch, dropout_keep_prob: 1.0})
+                all_predictions = np.concatenate([all_predictions, batch_predictions])
 
 # Print accuracy if y_test is defined
 if y_test is not None:
-    onlyfiles = [f for f in listdir(FLAGS.data_dir) if isfile(join(FLAGS.data_dir, f))]
+    onlyfiles = [f for f in listdir(data_dir) if isfile(join(data_dir, f))]
     lable_dict = {i: word.split('.')[0] for i, word in enumerate(onlyfiles)}
     print(lable_dict)
     y_vect = np.array([lable_dict[x.argmax()] for x in y_test])
@@ -132,7 +135,7 @@ if y_test is not None:
 # Save the evaluation to a csv
 predictions_human_readable = np.asarray([np.array([text for text in x_raw]), y_vect, all_predictions])
 print(predictions_human_readable.shape)
-out_path = os.path.join(FLAGS.checkpoint_dir, "..", "prediction.csv")
+out_path = os.path.join(FLAGS.checkpoint_dir + FLAGS.sub_folder + '/', "prediction.csv")
 print("Saving evaluation to {0}".format(out_path))
 with open(out_path, 'w') as f:
     csv.writer(f).writerows(np.transpose(predictions_human_readable))
