@@ -20,7 +20,7 @@ tf.flags.DEFINE_string("data_dir", "./data/processed/training/", "Data source fo
 tf.flags.DEFINE_string("dev_dir", "./data/processed/validation/", "Data source for validation.")
 tf.flags.DEFINE_string("test_dir", "./data/processed/testing/", "Data source for testing.")
 tf.flags.DEFINE_string("sub_folder", "folder1", "Sub folder use to cross validation. (default: None)")
-tf.flags.DEFINE_string("result_folder", "DACNN_cross_validation", "Folder use to save the result. (default: None)")
+tf.flags.DEFINE_string("result_folder", "TEXTCNN_cross_validation", "Folder use to save the result. (default: None)")
 
 tf.flags.DEFINE_integer("num_labels", None, "Number of labels for data. (default: None)")
 tf.flags.DEFINE_integer("max_document_len", 500, "Max document lenth. (default: None)")
@@ -228,6 +228,7 @@ with tf.Graph().as_default():
                         cnn.input_y: y_batch,
                         cnn.d_label: d_batch,
                         cnn.dropout_keep_prob: FLAGS.dropout_keep_prob,
+                        cnn.reverse_grad_lambda: 0.,
                         cnn.learning_rate : 0.002 / (1. + 10 * p)**0.75
                     }
                     _, _, step, summaries, loss, accuracy = sess.run(
@@ -236,7 +237,7 @@ with tf.Graph().as_default():
 
 
                 time_str = datetime.datetime.now().isoformat()
-                print("{}: label step {}, loss {:g}, acc {:g}, d_loss {:g}".format(time_str, step, loss, accuracy, d_loss))
+                print("{}: label step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
                 train_summary_writer.add_summary(summaries, step)
 
             def target_step(x_batch, y_batch,p = 1e-3):
@@ -292,7 +293,7 @@ with tf.Graph().as_default():
                 p = float(s) / (float(len(x_train)*FLAGS.num_epochs)/FLAGS.batch_size)
                 train_step(x_batch, y_batch, d_batch, p)
 
-                shuffle_indices = np.random.permutation(np.arange(len(x_t)))[:int(FLAGS.batch_size/4)]
+                shuffle_indices = np.random.permutation(np.arange(len(x_t)))[:int(FLAGS.batch_size)]
 
                 x_t_batch = x_t[shuffle_indices]
                 y_t_batch = y_t[shuffle_indices]
