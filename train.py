@@ -35,7 +35,7 @@ tf.flags.DEFINE_string("filter_sizes", "2,3,4,5", "Comma-spearated filter sizes 
 tf.flags.DEFINE_integer("num_filters", 256, "Number of filters per filter size (default: 128)")
 tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (default: 0.5)")
 tf.flags.DEFINE_float("l2_reg_lambda", 3.0, "L2 regularization lambda (default: 0.0)")
-tf.flags.DEFINE_float("reverse_grad_lambda", 0.1, "reverse gradient regularization lambda (default: 1.0)")
+tf.flags.DEFINE_boolean("reverse_grad", True, "Whether use reverse gradient regularization (default: True)")
 
 # Training paramters
 tf.flags.DEFINE_integer("batch_size", 256, "Batch Size (default: 64)")
@@ -210,18 +210,31 @@ with tf.Graph().as_default():
                 """
                 A single training step
                 """
-                feed_dict = {
-                    cnn.input_x: x_batch,
-                    cnn.input_y: y_batch,
-                    cnn.d_label: d_batch,
-                    cnn.dropout_keep_prob: FLAGS.dropout_keep_prob,
-                    cnn.reverse_grad_lambda: 2. / (1. + np.exp(-10. * p)) - 1,
-                    cnn.learning_rate : 0.002 / (1. + 10 * p)**0.75
-                }
+                if FLAGS.reverse_grad:
+                    feed_dict = {
+                        cnn.input_x: x_batch,
+                        cnn.input_y: y_batch,
+                        cnn.d_label: d_batch,
+                        cnn.dropout_keep_prob: FLAGS.dropout_keep_prob,
+                        cnn.reverse_grad_lambda: 2. / (1. + np.exp(-10. * p)) - 1,
+                        cnn.learning_rate : 0.002 / (1. + 10 * p)**0.75
+                    }
+                    _, _, step, summaries, loss, accuracy, d_loss = sess.run(
+                        [train_op, domain_op, global_step, train_summary_op, cnn.loss, cnn.accuracy, cnn.d_loss],
+                        feed_dict)
+                else:
+                    feed_dict = {
+                        cnn.input_x: x_batch,
+                        cnn.input_y: y_batch,
+                        cnn.d_label: d_batch,
+                        cnn.dropout_keep_prob: FLAGS.dropout_keep_prob,
+                        cnn.learning_rate : 0.002 / (1. + 10 * p)**0.75
+                    }
+                    _, _, step, summaries, loss, accuracy = sess.run(
+                        [train_op, domain_op, global_step, train_summary_op, cnn.loss, cnn.accuracy],
+                        feed_dict)
 
-                _,_, step, summaries, loss, accuracy, d_loss = sess.run(
-                    [train_op, domain_op, global_step, train_summary_op, cnn.loss, cnn.accuracy, cnn.d_loss],
-                    feed_dict)
+
                 time_str = datetime.datetime.now().isoformat()
                 print("{}: label step {}, loss {:g}, acc {:g}, d_loss {:g}".format(time_str, step, loss, accuracy, d_loss))
                 train_summary_writer.add_summary(summaries, step)
