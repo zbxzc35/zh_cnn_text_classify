@@ -20,7 +20,7 @@ tf.flags.DEFINE_string("data_dir", "./data/processed/training/", "Data source fo
 tf.flags.DEFINE_string("dev_dir", "./data/processed/validation/", "Data source for validation.")
 tf.flags.DEFINE_string("test_dir", "./data/processed/testing/", "Data source for testing.")
 tf.flags.DEFINE_string("sub_folder", "folder1", "Sub folder use to cross validation. (default: None)")
-tf.flags.DEFINE_string("result_folder", "DACNN_cross_validation", "Folder use to save the result. (default: None)")
+tf.flags.DEFINE_string("result_folder", "DACNN_cross_validation_withoutnews", "Folder use to save the result. (default: None)")
 
 tf.flags.DEFINE_integer("num_labels", None, "Number of labels for data. (default: None)")
 tf.flags.DEFINE_integer("max_document_len", 500, "Max document lenth. (default: None)")
