@@ -143,7 +143,7 @@ def padding_sentences(input_sentences, padding_token, padding_sentence_length = 
             sentence = sentence.replace(' ','')
             seg_list = jieba.cut(sentence)
             sentences.append(' '.join(seg_list).split(' '))
-    print(sentences[0])
+   # print(sentences[0])
 
 
     max_sentence_length = padding_sentence_length if padding_sentence_length is not None else max([len(sentence) for sentence in sentences])
@@ -196,7 +196,7 @@ def seperate_line(line):
     return ''.join([word + ' ' for word in line])
 
 def read_and_clean_zh_file(input_file, output_cleaned_file = None):
-    lines = list(open(input_file, "r").readlines())
+    lines = list(open(input_file, "r", encoding="utf-8").readlines())
     lines = [clean_str(seperate_line(line)) for line in lines]
     if output_cleaned_file is not None:
         with open(output_cleaned_file, 'w') as f:

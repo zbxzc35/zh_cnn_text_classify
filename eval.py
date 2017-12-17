@@ -22,7 +22,7 @@ tf.flags.DEFINE_string("sub_folder", "folder1", "Sub folder use to cross validat
 
 # Eval Parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_string("checkpoint_dir", "./runs/DACNN_cross_validation/", "Checkpoint directory from training run")
+tf.flags.DEFINE_string("checkpoint_dir", "./runs/DACNN_cross_validation_withoutnews/", "Checkpoint directory from training run")
 
 tf.flags.DEFINE_boolean("eval_train", True, "Evaluate on all training data")
 tf.flags.DEFINE_string("wordembedding_name", "trained_word2vec.model.all", "Word embedding model name. (default: trained_word2vec.model)")
@@ -137,6 +137,6 @@ predictions_human_readable = np.asarray([np.array([text for text in x_raw]), y_v
 print(predictions_human_readable.shape)
 out_path = os.path.join(FLAGS.checkpoint_dir + FLAGS.sub_folder + '/', "prediction.csv")
 print("Saving evaluation to {0}".format(out_path))
-with open(out_path, 'w') as f:
+with open(out_path, 'w', encoding='utf-8') as f:
     csv.writer(f).writerows(np.transpose(predictions_human_readable))
 
