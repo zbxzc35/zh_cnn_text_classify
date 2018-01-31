@@ -32,6 +32,11 @@ def embedding_sentences(sentences = None, embedding_size = 300, window = 5, min_
             else:
                 #fasttext
                 w2vModel = KeyedVectors.load_word2vec_format(file_to_load)
+            w2vModel.build_vocab(sentences, update=True)
+            w2vModel.model_trimmed_post_training = False
+            w2vModel.compute_loss = False
+            w2vModel.train(sentences,total_examples=w2vModel.corpus_count,epochs=w2vModel.iter)
+            w2vModel.save(file_to_save)
         else:
             w2vModel = Word2Vec(sentences, size = embedding_size, window = window, min_count = min_count, workers = multiprocessing.cpu_count())
             if file_to_save is not None:

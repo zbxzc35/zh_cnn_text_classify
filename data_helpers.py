@@ -137,7 +137,7 @@ def seperate_line(line):
 
 def read_and_clean_zh_file(input_file, output_cleaned_file = None):
     lines = list(open(input_file, "r").readlines())
-    lines = [clean_str(seperate_line(line.decode('utf-8'))) for line in lines]
+    lines = [clean_str(seperate_line(line)) for line in lines]
     if output_cleaned_file is not None:
         with open(output_cleaned_file, 'w') as f:
             for line in lines:
