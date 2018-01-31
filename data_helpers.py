@@ -51,23 +51,19 @@ def load_positive_negative_data_files(FLAGS):
 
     # Combine data
     examples = []
+    x_text = []
     for i in range(len(onlyfiles)):
         examples.append(read_and_clean_zh_file(mypath + onlyfiles[i]))
-        if i == 0:
-            x_text = examples[i][:]
-        else:
-            x_text += examples[i][:]
+        x_text += examples[i][:]
 
 
 
 
+    y = []
     # Generate labels
     I = np.eye(len(onlyfiles), dtype=int)
     for i in range(len(onlyfiles)):
-        if i == 0:
-            y = [I[i] for _ in examples[i]]
-        else:
-            y += [I[i] for _ in examples[i]]
+        y += [I[i] for _ in examples[i]]
 
 
     # y = np.concatenate([Ads_Marketing_labels, Agent_Issues_labels, Charity_Events_labels,
@@ -87,7 +83,7 @@ def padding_sentences(input_sentences, padding_token, padding_sentence_length = 
             sentence = sentence.replace(' ','')
             seg_list = jieba.cut(sentence)
             sentences.append(' '.join(seg_list).split(' '))
-    print sentences[0]
+    #print(sentences[0])
 
 
     max_sentence_length = padding_sentence_length if padding_sentence_length is not None else max([len(sentence) for sentence in sentences])
@@ -153,7 +149,7 @@ def clean_str(string):
     Tokenization/string cleaning for all datasets except for SST.
     Original taken from https://github.com/yoonkim/CNN_sentence/blob/master/process_data.py
     """
-    string = re.sub(ur"[^\u4e00-\u9fff]", " ", string)
+    string = re.sub("[^\u4e00-\u9fff]", " ", string)
     #string = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string)
     #string = re.sub(r"\'s", " \'s", string)
     #string = re.sub(r"\'ve", " \'ve", string)
